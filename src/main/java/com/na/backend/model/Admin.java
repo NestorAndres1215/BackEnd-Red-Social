@@ -24,8 +24,6 @@ public class Admin {
 
     @Column(name = "ad_apellido")
     private String apellido;
-    @Column(name = "ad_fechaRegistro")
-    private LocalDate fechaRegistro;
 
     @Column(name = "ad_correo")
     private String correo;
@@ -42,10 +40,111 @@ public class Admin {
     @Column(name = "ad_estado")
     private boolean estado;
 
+    @Column(name = "ad_fechaRegistro")
+    private LocalDate fechaRegistro;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ad_usuario", referencedColumnName = "us_codigo")
     private Usuario usuario;
 
-   
+    public Admin(String codigo, Usuario usuario, boolean estado, LocalDate fechaNacimiento, int edad, String telefono,
+            String correo, LocalDate fechaRegistro, String apellido, String nombre) {
+        this.codigo = codigo;
+        this.usuario = usuario;
+        this.estado = estado;
+        this.fechaNacimiento = fechaNacimiento;
+        this.edad = edad;
+        this.telefono = telefono;
+        this.correo = correo;
+        this.fechaRegistro = fechaRegistro;
+        this.apellido = apellido;
+        this.nombre = nombre;
+    }
 
+    public Admin() {
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+
+    public LocalDate getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(LocalDate fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public int getEdad() {
+        return edad;
+    }
+
+    public void setEdad(int edad) {
+        this.edad = edad;
+    }
+
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public boolean isEstado() {
+        return estado;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String codigoUsuario) {
+        if (codigoUsuario != null) {
+            Usuario usuario = new Usuario(); // Crear un objeto Usuario
+            usuario.setCodigo(codigoUsuario); // Asignar el código al usuario
+            this.usuario = usuario; // Asignarlo al administrador
+        }
+    }
 }
