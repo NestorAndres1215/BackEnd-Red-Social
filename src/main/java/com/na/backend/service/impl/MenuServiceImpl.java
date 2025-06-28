@@ -2,19 +2,19 @@ package com.na.backend.service.impl;
 
 import java.util.List;
 
-import com.na.backend.repository.RolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.na.backend.model.Menu;
 import com.na.backend.model.Rol;
+import com.na.backend.repository.MenuRepository;
 import com.na.backend.service.MenuService;
 
 @Service
 public class MenuServiceImpl implements MenuService {
 
     @Autowired
-    private RolRepository.MenuRepository menuRepository;
+    private MenuRepository menuRepository;
 
     @Override
     public List<Menu> obtenerMenusPorRol(Rol rol) {

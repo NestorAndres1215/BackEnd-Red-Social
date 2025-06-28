@@ -86,6 +86,7 @@ public class AdminServiceImpl implements AdminService {
             usuario.setUsername(adminDTO.getUsername());
             usuario.setPassword(adminDTO.getPassword()); // Podrías encriptarla aquí también
             usuario.setEstado(true);
+            usuario.setTelefono(adminDTO.getTelefono());
             usuario.setRol("0001");
             usuario.setCorreo(adminDTO.getCorreo());
 
@@ -112,6 +113,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin Actualizar(AdminDTO adminDTO) {
+            System.out.print("Administradores"+adminDTO);
         Optional<Admin> adminOptional = adminRepository.findById(adminDTO.getCodigoAdmin());
         if (!adminOptional.isPresent()) {
             throw new IllegalArgumentException(
@@ -132,6 +134,7 @@ public class AdminServiceImpl implements AdminService {
         usuario.setPassword(bCryptPasswordEncoder.encode(adminDTO.getPassword()));
         usuario.setCorreo(adminDTO.getCorreo());
         usuario.setEstado(true);
+        usuario.setTelefono(admin.getTelefono());
         usuario.setRol("0001");
 
         Login login = loginRepository.findById(adminDTO.getCodigoUsuario())

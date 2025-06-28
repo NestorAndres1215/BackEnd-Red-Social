@@ -3,9 +3,11 @@ package com.na.backend.validator;
 import java.io.IOException;
 import java.util.Base64;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 // Clase para validar datos de entrada 
+@Component
 public class Validaciones {
 
     public boolean validarTelefono(String telefono) {

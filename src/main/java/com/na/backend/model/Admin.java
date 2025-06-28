@@ -40,7 +40,7 @@ public class Admin {
     @Column(name = "ad_estado")
     private String estado;
 
-    @Column(name = "ad_fechaRegistro")
+    @Column(name = "ad_fechaRegistro", nullable = false)
     private LocalDate fechaRegistro;
 
     @ManyToOne(fetch = FetchType.EAGER)
