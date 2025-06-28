@@ -7,7 +7,7 @@ import com.na.backend.model.Usuario;
 public interface UsuarioService {
     
     // ultimo codigo de usuario
-    public String obtenerUltimoCodigoUsuario();
+     String obtenerUltimoCodigoUsuario();
 
     // Lista usuario por username
     List<Usuario> findByUsername(String username);

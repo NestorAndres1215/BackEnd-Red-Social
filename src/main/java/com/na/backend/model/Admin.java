@@ -38,7 +38,7 @@ public class Admin {
     private LocalDate fechaNacimiento;
 
     @Column(name = "ad_estado")
-    private boolean estado;
+    private String estado;
 
     @Column(name = "ad_fechaRegistro")
     private LocalDate fechaRegistro;
@@ -47,7 +47,7 @@ public class Admin {
     @JoinColumn(name = "ad_usuario", referencedColumnName = "us_codigo")
     private Usuario usuario;
 
-    public Admin(String codigo, Usuario usuario, boolean estado, LocalDate fechaNacimiento, int edad, String telefono,
+    public Admin(String codigo, Usuario usuario, String estado, LocalDate fechaNacimiento, int edad, String telefono,
             String correo, LocalDate fechaRegistro, String apellido, String nombre) {
         this.codigo = codigo;
         this.usuario = usuario;
@@ -128,11 +128,11 @@ public class Admin {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    public boolean isEstado() {
+    public String getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(String estado) {
         this.estado = estado;
     }
 
