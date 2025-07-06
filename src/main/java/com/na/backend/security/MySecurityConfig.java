@@ -15,6 +15,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.na.backend.jwt.JwtAuthenticationEntryPoint;
 import com.na.backend.jwt.JwtAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -41,7 +46,7 @@ public class MySecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults()) // ✅ ACTIVAR CORS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/generate-token", "/usuarios/", "/admin/guardar-admin").permitAll()
+                        .requestMatchers("/auth/generate-token", "/usuarios/", "/admin/guardar-admin").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
@@ -68,5 +73,7 @@ public class MySecurityConfig {
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
 
 }

@@ -11,8 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class BackSocialLinkApplication implements CommandLineRunner {
 
 	@Value("${server.port}")
-	private String puerto;
-	private static String PUERTO;
+	private  String PUERTO;
 
 	public static void main(String[] args) {
 		SpringApplication.run(BackSocialLinkApplication.class, args);

@@ -27,42 +27,32 @@ public class MenuController {
     @Autowired
     private RolRepository rolRepository; // Inyectamos el repositorio de Rol
 
-    @GetMapping("/listaRolesCodigo/{rolCodigoPrimero}/{rolCodigoSegundo}")
-    public ResponseEntity<?> obtenerMenusPorDosRoles(@PathVariable String rolCodigoPrimero,
-            @PathVariable String rolCodigoSegundo) {
+    @GetMapping("/listaRolesCodigo/{rolCodigoPrimero}")
+    public ResponseEntity<?> obtenerMenusPorRol(@PathVariable String rolCodigoPrimero) {
         try {
-            // Buscar los roles en la base de datos
-            Rol PrimerRol = rolRepository.findByCodigo(rolCodigoPrimero);
-            Rol SegundoRol = rolRepository.findByCodigo(rolCodigoSegundo);
+            // Buscar el rol en la base de datos
+            Rol rol = rolRepository.findByCodigo(rolCodigoPrimero);
 
-            // Validar si ambos roles existen
-            if (PrimerRol == null || SegundoRol == null) {
-                String mensaje = (PrimerRol == null ? rolCodigoPrimero : "") +
-                        (SegundoRol == null ? rolCodigoSegundo : "");
+            // Validar si el rol existe
+            if (rol == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(MenuMessage.ROL_NO_ENCONTRADO.getMensaje() + mensaje.trim());
+                        .body(MenuMessage.ROL_NO_ENCONTRADO.getMensaje() + rolCodigoPrimero);
             }
 
-            // Obtener menús para ambos roles
-            List<Menu> listadoPrimerRol = menuService.obtenerMenusPorRol(PrimerRol);
-            List<Menu> listadoSegundoRol = menuService.obtenerMenusPorRol(SegundoRol);
-
-            // Fusionar y evitar duplicados (opcional)
-            List<Menu> todosLosMenus = new ArrayList<>(listadoPrimerRol);
-            todosLosMenus.addAll(listadoSegundoRol);
+            // Obtener menús para el rol
+            List<Menu> menus = menuService.obtenerMenusPorRol(rol);
 
             // Validar si hay menús
-            if (todosLosMenus.isEmpty()) {
+            if (menus.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(MenuMessage.MENU_ROLES.getMensaje() + rolCodigoPrimero + " y " + rolCodigoSegundo);
+                        .body(MenuMessage.MENU_ROLES.getMensaje() + rolCodigoPrimero);
             }
 
             // Retornar menús encontrados
-            return ResponseEntity.ok(todosLosMenus);
+            return ResponseEntity.ok(menus);
 
         } catch (Exception e) {
             e.printStackTrace();
-            // Manejo de excepciones generales
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(SeguridadMessage.ERROR_INTERNO.getMensaje());
         }
