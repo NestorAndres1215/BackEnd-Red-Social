@@ -22,9 +22,17 @@ public interface NormalRepository extends JpaRepository<Normal, String> {
     @Query(value = "SELECT * FROM normal WHERE no_estado = 'SUSPENDIDO'", nativeQuery = true)
     List<Normal> listarNormalesSuspendidos();
 
+    @Query(value = "SELECT * FROM normal WHERE no_estado = 'INHABILITADO '", nativeQuery = true)
+    List<Normal> listarNormalesInabilitado();
+
     // Correo Existente
     boolean existsByCorreo(String correo);
 
     // Telefono Existente
     boolean existsByTelefono(String telefono);
+
+    //cantidad de usuario
+    @Query(value = "SELECT COUNT(*) FROM normal WHERE no_estado = 'ACTIVO'", nativeQuery = true)
+    long contarUsuariosNormales();
+
 }

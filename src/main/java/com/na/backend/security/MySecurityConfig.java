@@ -46,7 +46,7 @@ public class MySecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults()) // ✅ ACTIVAR CORS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/generate-token", "/usuarios/", "/admin/guardar-admin").permitAll()
+                        .requestMatchers("/auth/generate-token", "/usuarios/", "/admin/guardar-admin","/normal/guardar-normal").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))

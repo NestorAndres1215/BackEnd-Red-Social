@@ -134,7 +134,7 @@ public class AdminServiceImpl implements AdminService {
         usuario.setPassword(bCryptPasswordEncoder.encode(adminDTO.getPassword()));
         usuario.setCorreo(adminDTO.getCorreo());
         usuario.setEstado(true);
-        usuario.setTelefono(admin.getTelefono());
+        usuario.setTelefono(adminDTO.getTelefono());
         usuario.setRol("0001");
 
         Login login = loginRepository.findById(adminDTO.getCodigoUsuario())
