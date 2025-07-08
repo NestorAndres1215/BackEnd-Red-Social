@@ -36,7 +36,7 @@ public class MySecurityConfig {
     }
 
     // Metodo para la configuración de seguridad de Spring Security
-    // Este método se utiliza para configurar la seguridad de la aplicación web.
+    // Este metodo se utiliza para configurar la seguridad de la aplicación web.
     // Se utiliza para definir las reglas de autorización y autenticación de la
     // aplicación, así como para configurar el manejo de excepciones y la gestión de
     // sesiones.
