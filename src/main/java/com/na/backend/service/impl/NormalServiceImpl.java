@@ -42,6 +42,10 @@ public class NormalServiceImpl implements NormalService {
     @Autowired
     private Validaciones validaciones;
 
+    @Override
+    public List<Normal> obtenerNormalesPorUsuarioActivo(String username) {
+        return normalRepository.buscarPorUsuarioYEstadoActivo(username);
+    }
 
     @Override
     public List<Normal> listarUsuarioNormalActivos() {

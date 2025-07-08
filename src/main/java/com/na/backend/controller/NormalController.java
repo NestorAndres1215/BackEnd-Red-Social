@@ -55,4 +55,10 @@ public class NormalController {
     public List<Normal> listarSuspendidos() {
         return normalService.listarUsuarioNormalSuspendidos();
     }
+
+    @GetMapping("/listar/{username}")
+    public List<Normal> obtenerPorUsuarioActivo(@PathVariable String username) {
+        return normalService.obtenerNormalesPorUsuarioActivo(username);
+    }
+
 }

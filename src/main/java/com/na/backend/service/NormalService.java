@@ -9,7 +9,7 @@ import com.na.backend.model.Normal;
 import java.util.List;
 
 public interface NormalService {
-
+    List<Normal> obtenerNormalesPorUsuarioActivo(String username);
     List<Normal> listarUsuarioNormalActivos();
 
     List<Normal> listarUsuarioNormalDesactivos();
