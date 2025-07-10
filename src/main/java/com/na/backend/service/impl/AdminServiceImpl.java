@@ -18,11 +18,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
-public class AdminServiceImpl implements AdminService {
+public  class AdminServiceImpl implements AdminService {
 
     @Autowired
     private AdminRepository adminRepository;
@@ -52,6 +51,8 @@ public class AdminServiceImpl implements AdminService {
             return admins;
         }
     }
+
+
 
     @Override
     public List<Admin> listarAdminsActivados() {
@@ -264,4 +265,36 @@ public class AdminServiceImpl implements AdminService {
         return ResponseEntity.ok("Validación exitosa").hasBody();
     }
 
+
+
+    @Override
+    public List<Map<String, Object>> obtenerAdminsExcluyendoUsuario(String username) {
+        List<Object[]> resultados = adminRepository.listarAdminsExcluyendoUsuario(username);
+        List<Map<String, Object>> lista = new ArrayList<>();
+
+        for (Object[] fila : resultados) {
+            Map<String, Object> adminMap = new HashMap<>();
+
+            // Campos de la tabla admin (asumiendo orden exacto)
+            adminMap.put("Codigo", fila[0]);
+            adminMap.put("Nombre", fila[1]);
+            adminMap.put("Apellido", fila[2]);
+            adminMap.put("Correo", fila[3]);
+            adminMap.put("Telefono", fila[4]);
+            adminMap.put("Edad", fila[5]);
+            adminMap.put("FechaNacimiento", fila[6]);
+            adminMap.put("Estado", fila[7]);
+            adminMap.put("FechaRegistro", fila[8]);
+            adminMap.put("CodUsuario", fila[9]);
+
+            // Campos de la tabla usuario (extras del SP)
+            adminMap.put("Usuario", fila[10]);
+            adminMap.put("Contra", fila[11]);
+            adminMap.put("Rol", fila[12]);
+
+            lista.add(adminMap);
+        }
+
+        return lista;
+    }
 }

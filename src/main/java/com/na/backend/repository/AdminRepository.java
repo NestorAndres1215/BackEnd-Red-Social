@@ -1,9 +1,11 @@
 package com.na.backend.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.na.backend.model.Admin;
@@ -27,4 +29,10 @@ public interface AdminRepository extends JpaRepository<Admin, String> {
     boolean existsByTelefono(String telefono);
 
     List<Admin> findByUsuario_Codigo(String usuarioCodigo);
+
+
+
+    @Query(value = "CALL sp_listar_admins_excluyendo_usuario(:username_param)", nativeQuery = true)
+    List<Object[]> listarAdminsExcluyendoUsuario(@Param("username_param") String username);
+
 }

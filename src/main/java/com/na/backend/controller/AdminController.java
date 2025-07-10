@@ -1,6 +1,7 @@
 package com.na.backend.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -73,4 +74,22 @@ public class AdminController {
                     .body(e.getMessage());
         }
     }
+
+
+    @GetMapping("/listar/usuario/activo")
+    public ResponseEntity<?> listarAdminsExcluyendoUsuario(@RequestParam String username) {
+        try {
+            List<Map<String, Object>> admins = adminService.obtenerAdminsExcluyendoUsuario(username);
+
+            if (admins.isEmpty()) {
+                return ResponseEntity.noContent().build(); // 204 No Content
+            }
+
+            return ResponseEntity.ok(admins); // 200 OK
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
+    }
+
 }

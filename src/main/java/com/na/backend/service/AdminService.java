@@ -1,6 +1,7 @@
 package com.na.backend.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.na.backend.dto.AdminDTO;
 import com.na.backend.model.Admin;
@@ -28,4 +29,6 @@ public interface AdminService {
     Admin ActivarUsuario(String usuarioCodigo);
 
     List<Admin> getAdminsByUsuarioCodigo(String usuarioCodigo);
+
+    List<Map<String, Object>> obtenerAdminsExcluyendoUsuario(String username);
 }
