@@ -20,6 +20,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
     public Usuario findByUsernameAndEstado(@Param("username") String username);
 
     boolean existsByUsername(String username);
+    
+    boolean existsByCorreo(String correo);
+
+    boolean existsByTelefono(String telefono);
 
     boolean existsByUsernameAndPassword(String username, String password);
 

@@ -177,12 +177,12 @@ public class NormalServiceImpl implements NormalService {
 
     @Override
     public boolean ExistePorEmail(String email) {
-        return normalRepository.existsByCorreo(email);
+        return usuarioRepository.existsByCorreo(email);
     }
 
     @Override
     public boolean ExistePorTelefono(String telefono) {
-        return normalRepository.existsByTelefono(telefono);
+        return usuarioRepository.existsByTelefono(telefono);
     }
 
     @Override

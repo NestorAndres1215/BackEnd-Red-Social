@@ -94,7 +94,7 @@ public  class AdminServiceImpl implements AdminService {
             Admin admin = new Admin();
             admin.setCodigo(ultimoCodigoAdmin);
             admin.setNombre(adminDTO.getNombre());
-            admin.setApellido(adminDTO.getApelllido());
+            admin.setApellido(adminDTO.getApellido());
             admin.setTelefono(adminDTO.getTelefono());
             admin.setCorreo(adminDTO.getCorreo());
             admin.setEdad(adminDTO.getEdad());
@@ -122,7 +122,7 @@ public  class AdminServiceImpl implements AdminService {
         }
         Admin admin = adminOptional.get();
         admin.setNombre(adminDTO.getNombre());
-        admin.setApellido(adminDTO.getApelllido());
+        admin.setApellido(adminDTO.getApellido());
         admin.setTelefono(adminDTO.getTelefono());
         admin.setFechaNacimiento(adminDTO.getFechaNacimiento());
         admin.setEstado("ACTIVO");
@@ -165,12 +165,12 @@ public  class AdminServiceImpl implements AdminService {
 
     @Override
     public boolean ExistePorEmail(String email) {
-        return adminRepository.existsByCorreo(email);
+        return usuarioRepository.existsByCorreo(email);
     }
 
     @Override
     public boolean ExistePorTelefono(String telefono) {
-        return adminRepository.existsByTelefono(telefono);
+        return usuarioRepository.existsByTelefono(telefono);
     }
 
     @Override

@@ -6,7 +6,7 @@ public class AdminDTO {
     private String codigoUsuario;
     private String codigoAdmin;
     private String nombre;
-    private String apelllido;
+    private String apellido;
     private String correo;
     private String telefono;
     private int edad;
@@ -40,12 +40,12 @@ public class AdminDTO {
         this.nombre = nombre;
     }
 
-    public String getApelllido() {
-        return apelllido;
+    public String getApellido() {
+        return apellido;
     }
 
-    public void setApelllido(String apelllido) {
-        this.apelllido = apelllido;
+    public void setApellido(String apelllido) {
+        this.apellido = apelllido;
     }
 
     public String getCorreo() {
