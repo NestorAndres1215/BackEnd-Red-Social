@@ -65,16 +65,30 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/activar/{codigo}")
+    @DeleteMapping("/usuario/activar/{codigo}")
     public ResponseEntity<?> activarPorCodigo(@PathVariable String codigo) {
         try {
             return ResponseEntity.ok(adminService.ActivarUsuario(codigo));
+
         } catch (Exception e) {
+            System.out.print(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());
         }
     }
 
+    @DeleteMapping("/usuario/bloquear/{codigo}")
+    public ResponseEntity<?> bloquear(@PathVariable String codigo){
+        try {
+            System.out.print( codigo);
+            return ResponseEntity.ok(adminService.BloquearUsuario(codigo));
+
+        } catch (Exception e) {
+            System.out.print(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
+    }
 
     @GetMapping("/listar/usuario/activo")
     public ResponseEntity<?> listarAdminsExcluyendoUsuario(@RequestParam String username) {
@@ -82,10 +96,10 @@ public class AdminController {
             List<Map<String, Object>> admins = adminService.obtenerAdminsExcluyendoUsuario(username);
 
             if (admins.isEmpty()) {
-                return ResponseEntity.noContent().build(); // 204 No Content
+                return ResponseEntity.noContent().build();
             }
 
-            return ResponseEntity.ok(admins); // 200 OK
+            return ResponseEntity.ok(admins);
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());

@@ -23,7 +23,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return login;
     }
 
-   
-
-    // other methods...
 }

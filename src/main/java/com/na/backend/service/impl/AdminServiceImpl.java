@@ -77,7 +77,7 @@ public  class AdminServiceImpl implements AdminService {
             login.setCodigo(ultimoCodigo);
             login.setUsername(adminDTO.getUsername());
             login.setPassword(bCryptPasswordEncoder.encode(adminDTO.getPassword()));
-            login.setEstado(true);
+            login.setEstado("ACTIVO");
             login.setRol("ADMIN");
             login.setCorreo(adminDTO.getCorreo());
             login.setTelefono(adminDTO.getTelefono());
@@ -86,7 +86,7 @@ public  class AdminServiceImpl implements AdminService {
             usuario.setCodigo(ultimoCodigo);
             usuario.setUsername(adminDTO.getUsername());
             usuario.setPassword(adminDTO.getPassword()); // Podrías encriptarla aquí también
-            usuario.setEstado(true);
+            usuario.setEstado("ACTIVO");
             usuario.setTelefono(adminDTO.getTelefono());
             usuario.setRol("0001");
             usuario.setCorreo(adminDTO.getCorreo());
@@ -134,7 +134,7 @@ public  class AdminServiceImpl implements AdminService {
         usuario.setUsername(adminDTO.getUsername());
         usuario.setPassword(bCryptPasswordEncoder.encode(adminDTO.getPassword()));
         usuario.setCorreo(adminDTO.getCorreo());
-        usuario.setEstado(true);
+        usuario.setEstado("ACTIVO");
         usuario.setTelefono(adminDTO.getTelefono());
         usuario.setRol("0001");
 
@@ -145,7 +145,7 @@ public  class AdminServiceImpl implements AdminService {
         login.setPassword(bCryptPasswordEncoder.encode(adminDTO.getPassword()));
         login.setCorreo(adminDTO.getCorreo());
         login.setTelefono(adminDTO.getTelefono());
-        login.setEstado(true);
+        login.setEstado("ACTIVO");
 
         loginRepository.save(login);
         usuarioRepository.save(usuario);
@@ -180,63 +180,85 @@ public  class AdminServiceImpl implements AdminService {
             Admin admin = adminOptional.get();
             Optional<Usuario> usuario = usuarioRepository.findById(admin.getUsuario().getCodigo());
             if (usuario.isPresent()) {
-                // Cambiar el estado del usuario a false (desactivarlo)
                 Usuario usuarioEntity = usuario.get();
-                usuarioEntity.setEstado(false); // O el atributo correspondiente en tu entidad Usuario
-                usuarioRepository.save(usuarioEntity); // Guardar cambios
+                usuarioEntity.setEstado("INACTIVO");
+                usuarioRepository.save(usuarioEntity);
             }
-            // Buscar el Login relacionado
             Optional<Login> login = loginRepository.findById(admin.getUsuario().getCodigo());
 
             if (login.isPresent()) {
-                // Cambiar el estado del Login a false (desactivarlo)
                 Login loginEntity = login.get();
-                loginEntity.setEstado(false); // O el atributo correspondiente en tu entidad Login
-                loginRepository.save(loginEntity); // Guardar cambios
+                loginEntity.setEstado("INACTIVO");
+                loginRepository.save(loginEntity);
             }
 
-            // Cambiar el estado del Admin a false (desactivarlo)
-            admin.setEstado("INACTIVO"); // O el atributo correspondiente en tu entidad Admin
-            // Guardar cambios
+            admin.setEstado("INACTIVO");
 
-            return adminRepository.save(admin); // Retornar el Admin desactivado o el objeto que necesites
+            return adminRepository.save(admin);
         } else {
             throw new IllegalArgumentException(UsuarioMessage.ADMIN_NO_EXISTE.getMensaje());
         }
     }
 
-    // Metodo para activar un usuario (Admin, Usuario y Login)
+
     @Override
-    public Admin ActivarUsuario(String usuarioCodigo) {
+    public Login ActivarUsuario(String usuarioCodigo) {
 
-        Optional<Admin> adminOptional = adminRepository.findById(usuarioCodigo);
-        if (adminOptional.isPresent()) {
-            Admin admin = adminOptional.get();
-            Optional<Usuario> usuario = usuarioRepository.findById(admin.getUsuario().getCodigo());
-            if (usuario.isPresent()) {
-                // Cambiar el estado del usuario a true (activarlo)
-                Usuario usuarioEntity = usuario.get();
-                usuarioEntity.setEstado(true); // O el atributo correspondiente en tu entidad Usuario
-                usuarioRepository.save(usuarioEntity); // Guardar cambios
-            }
-            // Buscar el Login relacionado
-            Optional<Login> login = loginRepository.findById(admin.getUsuario().getCodigo());
-
+            Optional<Login> login = loginRepository.findById(usuarioCodigo);
             if (login.isPresent()) {
-                // Cambiar el estado del Login a true (activarlo)
                 Login loginEntity = login.get();
-                loginEntity.setEstado(true); // O el atributo correspondiente en tu entidad Login
-                loginRepository.save(loginEntity); // Guardar cambios
+
+                Optional<Admin> admin = adminRepository.findByCorreo(login.get().getCorreo());
+                System.out.print(admin);
+                if(admin.isPresent()){
+                    Admin adminEntity = admin.get();
+                    adminEntity.setEstado("ACTIVO");
+                   adminRepository.save(adminEntity);
+                }
+                Optional<Usuario> usuario = usuarioRepository.findById(usuarioCodigo);
+                if (usuario.isPresent()) {
+
+                    Usuario usuarioEntity = usuario.get();
+                    usuarioEntity.setEstado("ACTIVO");
+                    usuarioRepository.save(usuarioEntity);
+                }
+                loginEntity.setEstado("ACTIVO");
+                return loginRepository.save(loginEntity);
             }
+            else {
+                throw new IllegalArgumentException(UsuarioMessage.ADMIN_NO_EXISTE.getMensaje());
+            }
+    }
 
-            // Cambiar el estado del Admin a true (activarlo)
-            admin.setEstado("ACTIVO"); // O el atributo correspondiente en tu entidad Admin
-            // Guardar cambios
+    @Override
+    public Login BloquearUsuario(String usuarioCodigo) {
+System.out.print(usuarioCodigo);
+        Login login = loginRepository.findByUsername(usuarioCodigo);
 
-            return adminRepository.save(admin); // Retornar el Admin activado o el objeto que necesites
-        } else {
+        if (login != null) {
+            System.out.print(login);
+            login.setEstado("BLOQUEADO");
+            Optional<Admin> admin = adminRepository.findByCorreo(login.getCorreo());
+            System.out.print(admin);
+            if(admin.isPresent()){
+                Admin adminEntity = admin.get();
+                adminEntity.setEstado("BLOQUEADO");
+                adminRepository.save(adminEntity);
+            }
+            Optional<Usuario> usuario = usuarioRepository.findById(login.getCodigo());
+            if (usuario.isPresent()) {
+
+                Usuario usuarioEntity = usuario.get();
+                usuarioEntity.setEstado("BLOQUEADO");
+                usuarioRepository.save(usuarioEntity);
+            }
+            return loginRepository.save(login);
+        }
+
+        else {
             throw new IllegalArgumentException(UsuarioMessage.ADMIN_NO_EXISTE.getMensaje());
         }
+
     }
 
     private boolean validarAdmin(AdminDTO adminDTO) {

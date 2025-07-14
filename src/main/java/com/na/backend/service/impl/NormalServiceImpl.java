@@ -2,6 +2,8 @@ package com.na.backend.service.impl;
 
 
 import com.na.backend.dto.NormalDTO;
+import com.na.backend.message.UsuarioMessage;
+import com.na.backend.model.Admin;
 import com.na.backend.model.Login;
 import com.na.backend.model.Normal;
 import com.na.backend.model.Usuario;
@@ -79,7 +81,7 @@ public class NormalServiceImpl implements NormalService {
             login.setCodigo(ultimoCodigo);
             login.setUsername(normalDTO.getUsername());
             login.setPassword(bCryptPasswordEncoder.encode(normalDTO.getPassword()));
-            login.setEstado(true);
+            login.setEstado("ACTIVO");
             login.setRol("NORMAL");
             login.setCorreo(normalDTO.getCorreo());
             login.setTelefono(normalDTO.getTelefono());
@@ -89,7 +91,7 @@ public class NormalServiceImpl implements NormalService {
             usuario.setCodigo(ultimoCodigo);
             usuario.setUsername(normalDTO.getUsername());
             usuario.setPassword(normalDTO.getPassword()); // Podrías encriptarla aquí también
-            usuario.setEstado(true);
+            usuario.setEstado("ACTIVO");
             usuario.setTelefono(normalDTO.getTelefono());
             usuario.setRol("0003");
             usuario.setCorreo(normalDTO.getCorreo());
@@ -143,7 +145,7 @@ public class NormalServiceImpl implements NormalService {
                 usuario.setUsername(normalDTO.getUsername());
                 usuario.setPassword(bCryptPasswordEncoder.encode(normalDTO.getPassword()));
                 usuario.setCorreo(normal.getCorreo());
-                usuario.setEstado(true);
+                usuario.setEstado("ACTIVO");
                 usuario.setTelefono(normalDTO.getTelefono());
                 usuario.setRol("0003");
 
@@ -154,7 +156,7 @@ public class NormalServiceImpl implements NormalService {
                 login.setPassword(bCryptPasswordEncoder.encode(normalDTO.getPassword()));
                 login.setCorreo(normalDTO.getCorreo());
                 login.setTelefono(normalDTO.getTelefono());
-                login.setEstado(true);
+                login.setEstado("ACTIVO");
                 loginRepository.save(login);
                 usuarioRepository.save(usuario);
                 return normalRepository.save(normal);
@@ -196,10 +198,65 @@ public class NormalServiceImpl implements NormalService {
     }
 
     @Override
-    public Normal ActivarUsuario(String usuarioCodigo) {
-        return null;
+    public Login ActivarUsuario(String usuarioCodigo) {
+
+        Optional<Login> login = loginRepository.findById(usuarioCodigo);
+        if (login.isPresent()) {
+            Login loginEntity = login.get();
+
+            Optional<Normal> normal = normalRepository.findByCorreo(login.get().getCorreo());
+
+            if(normal.isPresent()){
+                Normal normalEntity = normal.get();
+                normalEntity.setEstado("ACTIVO");
+                normalRepository.save(normalEntity);
+            }
+            Optional<Usuario> usuario = usuarioRepository.findById(usuarioCodigo);
+            if (usuario.isPresent()) {
+
+                Usuario usuarioEntity = usuario.get();
+                usuarioEntity.setEstado("ACTIVO");
+                usuarioRepository.save(usuarioEntity);
+            }
+            loginEntity.setEstado("ACTIVO");
+            return loginRepository.save(loginEntity);
+        }
+        else {
+            throw new IllegalArgumentException(UsuarioMessage.ADMIN_NO_EXISTE.getMensaje());
+        }
     }
 
+
+    @Override
+    public Login BloquearUsuario(String usuarioCodigo) {
+        System.out.print(usuarioCodigo);
+        Login login = loginRepository.findByUsername(usuarioCodigo);
+
+        if (login != null) {
+            System.out.print(login);
+            login.setEstado("BLOQUEADO");
+            Optional<Normal> normal = normalRepository.findByCorreo(login.getCorreo());
+            System.out.print(normal);
+            if(normal.isPresent()){
+                Normal normal1 = normal.get();
+                normal1.setEstado("BLOQUEADO");
+                normalRepository.save(normal1);
+            }
+            Optional<Usuario> usuario = usuarioRepository.findById(login.getCodigo());
+            if (usuario.isPresent()) {
+
+                Usuario usuarioEntity = usuario.get();
+                usuarioEntity.setEstado("BLOQUEADO");
+                usuarioRepository.save(usuarioEntity);
+            }
+            return loginRepository.save(login);
+        }
+
+        else {
+            throw new IllegalArgumentException(UsuarioMessage.ADMIN_NO_EXISTE.getMensaje());
+        }
+
+    }
 
     private boolean validarNormal(NormalDTO normalDTO) {
 

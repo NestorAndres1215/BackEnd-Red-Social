@@ -64,6 +64,22 @@ public class Admin {
     public Admin() {
     }
 
+    @Override
+    public String toString() {
+        return "Admin{" +
+                "codigo='" + codigo + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", correo='" + correo + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", edad=" + edad +
+                ", fechaNacimiento=" + fechaNacimiento +
+                ", estado='" + estado + '\'' +
+                ", fechaRegistro=" + fechaRegistro +
+                ", usuario=" + usuario +
+                '}';
+    }
+
     public String getCodigo() {
         return codigo;
     }

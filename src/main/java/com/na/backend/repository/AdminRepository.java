@@ -2,6 +2,7 @@ package com.na.backend.repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -29,6 +30,8 @@ public interface AdminRepository extends JpaRepository<Admin, String> {
     boolean existsByTelefono(String telefono);
 
     List<Admin> findByUsuario_Codigo(String usuarioCodigo);
+    Optional<Admin> findByCorreo(String correo);
+
 
 
 

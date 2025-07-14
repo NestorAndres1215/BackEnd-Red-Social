@@ -23,7 +23,7 @@ public class Usuario {
     private String password; // Contraseña encriptada
 
     @Column(name = "us_estado", nullable = false)
-    private boolean estado; // Estado del usuario (activo/inactivo)
+    private String estado; // Estado del usuario (activo/inactivo)
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "us_rol", referencedColumnName = "tr_codigo")
@@ -71,11 +71,11 @@ public class Usuario {
         this.password = password;
     }
 
-    public boolean isEstado() {
+    public String isEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(String estado) {
         this.estado = estado;
     }
 

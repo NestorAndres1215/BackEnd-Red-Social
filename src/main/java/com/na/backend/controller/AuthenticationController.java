@@ -9,11 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import com.na.backend.jwt.JwtRequest;
 import com.na.backend.jwt.JwtResponse;
@@ -44,6 +40,7 @@ public class AuthenticationController {
     public ResponseEntity<?> generarToken(@RequestBody JwtRequest jwtRequest) throws Exception {
         try {
             // Verifica que el usuario exista
+
             if (!usuarioService.usuarioExistePorUsername(jwtRequest.getUsername())) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(SeguridadMessage.USUARIO_NO_ENCONTRADO.getMensaje());
@@ -81,7 +78,6 @@ public class AuthenticationController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(SeguridadMessage.USUARIO_NO_AUTORIZADO.getMensaje());
             }
-
             Login usuario = (Login) this.userDetailsService.loadUserByUsername(principal.getName());
             return ResponseEntity.ok(usuario);
 
@@ -91,4 +87,19 @@ public class AuthenticationController {
                     .body(SeguridadMessage.ERROR_USUARIO_ACTUAL.getMensaje());
         }
     }
+
+    @DeleteMapping("/usuario/bloquear/{codigo}")
+    public ResponseEntity<?> bloquear(@PathVariable String codigo){
+        try {
+            System.out.print( codigo);
+            return ResponseEntity.ok(usuarioService.validacionBloqueo(codigo));
+
+        } catch (Exception e) {
+            System.out.print(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
+    }
+
+
 }

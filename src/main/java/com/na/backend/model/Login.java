@@ -29,10 +29,10 @@ public class Login implements UserDetails {
     @Column(name = "ul_rol")
     private String rol;
     @Column(name = "ul_estado", nullable = false)
-    private boolean estado;
+    private String estado;
 
     public Login(String codigo, String username, String password, String correo, String telefono, String rol,
-            boolean estado) {
+            String estado) {
         this.codigo = codigo;
         this.username = username;
         this.password = password;
@@ -95,11 +95,11 @@ public class Login implements UserDetails {
         this.rol = rol;
     }
 
-    public boolean isEstado() {
+    public String getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(String estado) {
         this.estado = estado;
     }
 

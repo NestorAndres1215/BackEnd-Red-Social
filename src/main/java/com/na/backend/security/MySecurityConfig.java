@@ -35,18 +35,13 @@ public class MySecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    // Metodo para la configuración de seguridad de Spring Security
-    // Este metodo se utiliza para configurar la seguridad de la aplicación web.
-    // Se utiliza para definir las reglas de autorización y autenticación de la
-    // aplicación, así como para configurar el manejo de excepciones y la gestión de
-    // sesiones.
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults()) // ✅ ACTIVAR CORS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/generate-token", "/usuarios/", "/admin/guardar-admin","/normal/guardar-normal").permitAll()
+                        .requestMatchers("/auth/generate-token", "/usuarios/", "/admin/guardar-admin","/normal/guardar-normal","/auth/usuario/bloquear/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
@@ -57,18 +52,12 @@ public class MySecurityConfig {
         return http.build();
     }
 
-    // Metodo para la authenticationConfiguration y sirve el AuthenticationManager
-    // para la autenticación de usuarios en Spring Security.
-    // Este método se utiliza para crear un bean de AuthenticationManager que se
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // Configuración de la codificación de contraseñas
-    // BCryptPasswordEncoder es una implementación de PasswordEncoder que utiliza el
-    // algoritmo BCrypt para codificar contraseñas.
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

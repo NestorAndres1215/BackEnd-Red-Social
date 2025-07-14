@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.na.backend.dto.AdminDTO;
 import com.na.backend.model.Admin;
+import com.na.backend.model.Login;
 
 public interface AdminService {
 
@@ -26,7 +27,9 @@ public interface AdminService {
 
     Admin DesactivarUsuario(String usuarioCodigo);
 
-    Admin ActivarUsuario(String usuarioCodigo);
+    Login ActivarUsuario(String usuarioCodigo);
+
+    Login BloquearUsuario(String usuarioCodigo);
 
     List<Admin> getAdminsByUsuarioCodigo(String usuarioCodigo);
 

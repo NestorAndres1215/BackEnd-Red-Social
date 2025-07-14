@@ -3,6 +3,7 @@ package com.na.backend.service;
 import java.util.List;
 
 import com.na.backend.model.Usuario;
+import org.springframework.http.ResponseEntity;
 
 public interface UsuarioService {
     
@@ -17,4 +18,7 @@ public interface UsuarioService {
 
     // validaciones de usuario y contraseña valida
     boolean existsByUsernameAndPassword(String username, String password);
+    ResponseEntity<?> validacionBloqueo(String username);
+
+
 }

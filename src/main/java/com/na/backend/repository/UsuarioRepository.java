@@ -16,8 +16,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
     List<Usuario> findByCodigoAndUsername(String codigo, String username);
 
-    @Query("SELECT u FROM Usuario u WHERE u.username = :username AND u.estado = true")
-    public Usuario findByUsernameAndEstado(@Param("username") String username);
+
 
     boolean existsByUsername(String username);
     

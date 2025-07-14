@@ -1,7 +1,9 @@
 package com.na.backend.repository;
 
 import java.util.List;
+import java.util.Optional;
 
+import com.na.backend.model.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -44,5 +46,5 @@ public interface NormalRepository extends JpaRepository<Normal, String> {
     """, nativeQuery = true)
     List<Normal> buscarPorUsuarioYEstadoActivo(@Param("username") String username);
 
-
+    Optional<Normal> findByCorreo(String correo);
 }

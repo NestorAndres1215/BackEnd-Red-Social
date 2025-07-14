@@ -4,6 +4,7 @@ package com.na.backend.service;
 
 import com.na.backend.dto.NormalDTO;
 import com.na.backend.model.Admin;
+import com.na.backend.model.Login;
 import com.na.backend.model.Normal;
 
 import java.util.List;
@@ -33,6 +34,8 @@ public interface NormalService {
     Normal SuspenderUsuario(String usuarioCodigo);
     Normal DesactivarUsuario(String usuarioCodigo);
 
-    Normal ActivarUsuario(String usuarioCodigo);
+    Login ActivarUsuario(String usuarioCodigo);
+
+    Login BloquearUsuario(String usuarioCodigo);
 
 }
