@@ -31,7 +31,7 @@ public class Moderador {
     private String telefono;
 
     @Column(name = "mod_edad")
-    private int edad;
+    private Integer edad;
 
     @Column(name = "mod_fechanacimiento")
     private LocalDate fechaNacimiento;
@@ -56,7 +56,7 @@ public class Moderador {
     public Moderador() {
     }
 
-    public Moderador(String codigo, String nombre, String apellido, String correo, String telefono, int edad,
+    public Moderador(String codigo, String nombre, String apellido, String correo, String telefono,Integer edad,
             LocalDate fechaNacimiento, String estado, LocalDate fechaRegistro, String genero,
             LocalDateTime ultimoAcceso, Usuario usuario) {
         this.codigo = codigo;
@@ -71,6 +71,24 @@ public class Moderador {
         this.genero = genero;
         this.ultimoAcceso = ultimoAcceso;
         this.usuario = usuario;
+    }
+
+    @Override
+    public String toString() {
+        return "Moderador{" +
+                "codigo='" + codigo + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", correo='" + correo + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", edad=" + edad +
+                ", fechaNacimiento=" + fechaNacimiento +
+                ", estado='" + estado + '\'' +
+                ", fechaRegistro=" + fechaRegistro +
+                ", genero='" + genero + '\'' +
+                ", ultimoAcceso=" + ultimoAcceso +
+                ", usuario=" + usuario +
+                '}';
     }
 
     public String getCodigo() {
@@ -113,11 +131,11 @@ public class Moderador {
         this.telefono = telefono;
     }
 
-    public int getEdad() {
+    public Integer getEdad() {
         return edad;
     }
 
-    public void setEdad(int edad) {
+    public void setEdad(Integer edad) {
         this.edad = edad;
     }
 

@@ -100,6 +100,16 @@ public class AuthenticationController {
                     .body(e.getMessage());
         }
     }
+    @DeleteMapping("/usuario/suspender/{codigo}")
+    public ResponseEntity<?> suspender(@PathVariable String codigo, @RequestParam String rol) {
+        try {
+            return  ResponseEntity.ok(usuarioService.validacionSuspender(codigo,rol));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
+    }
+
 
 
 }

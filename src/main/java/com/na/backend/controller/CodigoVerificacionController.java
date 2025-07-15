@@ -38,4 +38,5 @@ public class CodigoVerificacionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error en la verificación");
         }
     }
+
 }

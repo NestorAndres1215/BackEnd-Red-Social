@@ -28,4 +28,10 @@ public interface ModeradorRepository extends JpaRepository<Moderador, String> {
 
     // Telefono Existente
     boolean existsByTelefono(String telefono);
+
+
+    @Query(value = "SELECT * FROM moderador WHERE mod_estado = 'ACTIVO' ORDER BY RAND() LIMIT 1", nativeQuery = true)
+    Moderador obtenerModeradorActivoAleatorio();
 }
+
+

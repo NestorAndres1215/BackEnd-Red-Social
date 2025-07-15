@@ -8,6 +8,7 @@ import com.na.backend.model.Login;
 import com.na.backend.model.Normal;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface NormalService {
     List<Normal> obtenerNormalesPorUsuarioActivo(String username);
@@ -37,5 +38,7 @@ public interface NormalService {
     Login ActivarUsuario(String usuarioCodigo);
 
     Login BloquearUsuario(String usuarioCodigo);
+
+    Optional<Normal> findById(String codigo);
 
 }

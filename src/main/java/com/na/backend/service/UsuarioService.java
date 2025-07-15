@@ -20,5 +20,5 @@ public interface UsuarioService {
     boolean existsByUsernameAndPassword(String username, String password);
     ResponseEntity<?> validacionBloqueo(String username);
 
-
+    ResponseEntity<?> validacionSuspender(String codigo,String rol);
 }

@@ -90,6 +90,8 @@ public class AdminController {
         }
     }
 
+
+
     @GetMapping("/listar/usuario/activo")
     public ResponseEntity<?> listarAdminsExcluyendoUsuario(@RequestParam String username) {
         try {

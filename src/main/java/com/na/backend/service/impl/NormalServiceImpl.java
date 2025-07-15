@@ -189,7 +189,32 @@ public class NormalServiceImpl implements NormalService {
 
     @Override
     public Normal SuspenderUsuario(String usuarioCodigo) {
-        return null;
+
+        Optional<Normal> normalOptional = normalRepository.findById(usuarioCodigo);
+
+
+        if (normalOptional.isPresent()) {
+            Normal normal = normalOptional.get();
+
+            Optional<Usuario> usuario = usuarioRepository.findById(normal.getUsuario().getCodigo());
+            if (usuario.isPresent()) {
+                Usuario usuarioEntity = usuario.get();
+                usuarioEntity.setEstado("SUSPENDIDO");
+                usuarioRepository.save(usuarioEntity);
+            }
+
+            Optional<Login> login = loginRepository.findById(normal.getUsuario().getCodigo());
+            if (login.isPresent()) {
+                Login loginEntity = login.get();
+                loginEntity.setEstado("SUSPENDIDO");
+                loginRepository.save(loginEntity);
+            }
+
+            normal.setEstado("SUSPENDIDO");
+            return normalRepository.save(normal);
+        } else {
+            throw new IllegalArgumentException("El código de usuario no existe: " + usuarioCodigo);
+        }
     }
 
     @Override
@@ -256,6 +281,11 @@ public class NormalServiceImpl implements NormalService {
             throw new IllegalArgumentException(UsuarioMessage.ADMIN_NO_EXISTE.getMensaje());
         }
 
+    }
+
+    @Override
+    public Optional<Normal> findById(String codigo) {
+        return normalRepository.findById(codigo);
     }
 
     private boolean validarNormal(NormalDTO normalDTO) {

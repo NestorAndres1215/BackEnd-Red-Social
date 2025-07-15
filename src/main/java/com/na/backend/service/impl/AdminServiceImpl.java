@@ -1,19 +1,24 @@
 package com.na.backend.service.impl;
 
 import com.na.backend.dto.AdminDTO;
+import com.na.backend.dto.RevisionSuspencionDTO;
 import com.na.backend.message.UsuarioMessage;
-import com.na.backend.model.Admin;
-import com.na.backend.model.Login;
-import com.na.backend.model.Usuario;
+import com.na.backend.model.*;
 import com.na.backend.repository.AdminRepository;
 import com.na.backend.repository.LoginRepository;
+import com.na.backend.repository.ModeradorRepository;
 import com.na.backend.repository.UsuarioRepository;
 import com.na.backend.service.AdminService;
+import com.na.backend.service.ModeradorService;
+import com.na.backend.service.SuspencionesService;
 import com.na.backend.service.UsuarioService;
 import com.na.backend.validator.Secuencia;
 import com.na.backend.validator.Validaciones;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +46,13 @@ public  class AdminServiceImpl implements AdminService {
     @Autowired
     private UsuarioService usuarioService;
 
-        @Override
+    @Autowired
+    private SuspencionesService suspencionesService;
+
+    @Autowired
+    private ModeradorService moderadorService;
+
+    @Override
     public List<Admin> getAdminsByUsuarioCodigo(String usuarioCodigo) {
         List<Admin> admins = adminRepository.findByUsuario_Codigo(usuarioCodigo);
         // Si la lista está vacía, devolvemos null
@@ -52,7 +63,10 @@ public  class AdminServiceImpl implements AdminService {
         }
     }
 
-
+    @Override
+    public Optional<Admin> findById(String codigo) {
+        return adminRepository.findById(codigo);
+    }
 
     @Override
     public List<Admin> listarAdminsActivados() {
@@ -200,6 +214,39 @@ public  class AdminServiceImpl implements AdminService {
         }
     }
 
+    @Override
+    public Admin SuspenderUsuario(String usuarioCodigo) {
+
+            Optional<Admin> adminOptional = adminRepository.findById(usuarioCodigo);
+            System.out.print(adminOptional);
+
+            if (adminOptional.isPresent()) {
+                Admin admin = adminOptional.get();
+
+                Optional<Usuario> usuario = usuarioRepository.findById(admin.getUsuario().getCodigo());
+                if (usuario.isPresent()) {
+                    Usuario usuarioEntity = usuario.get();
+                    usuarioEntity.setEstado("SUSPENDIDO");
+                    usuarioRepository.save(usuarioEntity);
+                }
+
+                Optional<Login> login = loginRepository.findById(admin.getUsuario().getCodigo());
+                if (login.isPresent()) {
+                    Login loginEntity = login.get();
+                    loginEntity.setEstado("SUSPENDIDO");
+                    loginRepository.save(loginEntity);
+                }
+
+                admin.setEstado("SUSPENDIDO");
+                return adminRepository.save(admin);
+            } else {
+                throw new IllegalArgumentException("El código de usuario no existe: " + usuarioCodigo);
+            }
+
+
+    }
+
+
 
     @Override
     public Login ActivarUsuario(String usuarioCodigo) {
@@ -289,6 +336,8 @@ System.out.print(usuarioCodigo);
 
 
 
+
+
     @Override
     public List<Map<String, Object>> obtenerAdminsExcluyendoUsuario(String username) {
         List<Object[]> resultados = adminRepository.listarAdminsExcluyendoUsuario(username);
@@ -319,4 +368,7 @@ System.out.print(usuarioCodigo);
 
         return lista;
     }
+
+
+
 }

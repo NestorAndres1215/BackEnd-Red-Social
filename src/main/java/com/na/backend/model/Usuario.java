@@ -30,6 +30,19 @@ public class Usuario {
     @JsonIgnore
     private Rol rol;
 
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "codigo='" + codigo + '\'' +
+                ", username='" + username + '\'' +
+                ", correo='" + correo + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", password='" + password + '\'' +
+                ", estado='" + estado + '\'' +
+                ", rol=" + rol +
+                '}';
+    }
+
     // Getters y Setters
     public String getCodigo() {
         return codigo;
