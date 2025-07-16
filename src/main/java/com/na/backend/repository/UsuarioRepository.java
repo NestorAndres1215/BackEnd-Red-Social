@@ -14,10 +14,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
     List<Usuario> findByUsername(String username);
 
-    List<Usuario> findByCodigoAndUsername(String codigo, String username);
-
-
-
     boolean existsByUsername(String username);
     
     boolean existsByCorreo(String correo);
@@ -25,8 +21,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
     boolean existsByTelefono(String telefono);
 
     boolean existsByUsernameAndPassword(String username, String password);
-
-    Usuario findByCodigo(String codigo);
 
     @Query(value = "SELECT MAX(us_codigo) FROM Usuario", nativeQuery = true)
     String obtenerUltimoCodigo();

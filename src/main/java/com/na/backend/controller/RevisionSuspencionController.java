@@ -1,6 +1,5 @@
 package com.na.backend.controller;
 
-import com.na.backend.model.Admin;
 import com.na.backend.model.RevisionSuspension;
 import com.na.backend.model.Suspensiones;
 import com.na.backend.model.Usuario;

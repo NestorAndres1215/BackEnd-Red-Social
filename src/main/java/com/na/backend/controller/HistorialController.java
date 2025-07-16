@@ -1,15 +1,12 @@
 package com.na.backend.controller;
 
-import com.na.backend.dto.AdminDTO;
 import com.na.backend.dto.HistorialDTO;
 import com.na.backend.service.HistorialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")

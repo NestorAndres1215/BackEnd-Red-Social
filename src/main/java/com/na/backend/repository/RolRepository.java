@@ -10,7 +10,7 @@ import com.na.backend.model.Rol;
 
 @Repository
 public interface RolRepository extends JpaRepository<Rol, String> {
-    // Metodo para buscar un rol por su codigo
+
     Rol findByCodigo(String codigo);
 
 }

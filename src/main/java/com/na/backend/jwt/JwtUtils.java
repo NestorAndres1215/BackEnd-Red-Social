@@ -14,8 +14,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtUtils {
 
-    private static final String SECRET_KEY = "examportal"; // Usa una clave segura y cámbiala cuando sea necesario
-
+    private static final String SECRET_KEY = "examportal";
     // Extraer el nombre de usuario del token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RevisionSuspensionRepository extends JpaRepository<RevisionSuspension,String> {
+
     @Query(value = "SELECT MAX(rs_codigo) FROM Revisiones_Suspension", nativeQuery = true)
     String obtenerUltimoCodigo();
+
 }

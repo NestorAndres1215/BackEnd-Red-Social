@@ -1,7 +1,6 @@
 package com.na.backend.config;
 
 import com.na.backend.model.CodigoVerificacion;
-import com.na.backend.model.Login;
 import com.na.backend.repository.CodigoVerificacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

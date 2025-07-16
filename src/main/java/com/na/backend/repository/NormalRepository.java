@@ -16,17 +16,8 @@ public interface NormalRepository extends JpaRepository<Normal, String> {
     @Query(value = "SELECT MAX(no_codigo) FROM Normal", nativeQuery = true)
     String obtenerUltimoCodigoNormal();
 
-    @Query(value = "SELECT * FROM normal WHERE no_estado = 'ACTIVO'", nativeQuery = true)
-    List<Normal> listarNormalesActivados();
-
-    @Query(value = "SELECT * FROM normal WHERE no_estado = 'INACTIVO'", nativeQuery = true)
-    List<Normal> listarNormalesInactivos();
-
-    @Query(value = "SELECT * FROM normal WHERE no_estado = 'SUSPENDIDO'", nativeQuery = true)
-    List<Normal> listarNormalesSuspendidos();
-
-    @Query(value = "SELECT * FROM normal WHERE no_estado = 'INHABILITADO '", nativeQuery = true)
-    List<Normal> listarNormalesInabilitado();
+    @Query(value = "SELECT * FROM normal WHERE no_estado = :estado", nativeQuery = true)
+    List<Normal> listarNormalesPorEstado(@Param("estado") String estado);
 
     // Correo Existente
     boolean existsByCorreo(String correo);

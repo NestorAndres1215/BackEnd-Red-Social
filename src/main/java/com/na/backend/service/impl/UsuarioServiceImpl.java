@@ -7,7 +7,6 @@ import java.util.Optional;
 import com.na.backend.dto.RevisionSuspencionDTO;
 import com.na.backend.model.*;
 import com.na.backend.service.*;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -115,6 +114,8 @@ revisionSuspencionDTO.setFechaSuspension(LocalDate.now());
             revisionSuspencionDTO.setCorreo(correo);
             revisionSuspencionDTO.setUsuario(usuario);
             enviarCorreoDisculpas(revisionSuspencionDTO);
+            RevisionSuspencionDTO revisionSuspencionDTO1 =new RevisionSuspencionDTO();
+            revisionSuspencionDTO1.setCodigo(admin.getUsuario().getCodigo());
             revisionSuspensionService.registar(revisionSuspencionDTO);
             return ResponseEntity.ok(adminService.SuspenderUsuario(codigo));
 
@@ -126,6 +127,8 @@ revisionSuspencionDTO.setFechaSuspension(LocalDate.now());
             revisionSuspencionDTO.setCorreo(correo);
             revisionSuspencionDTO.setUsuario(usuario);
             enviarCorreoDisculpas(revisionSuspencionDTO);
+            RevisionSuspencionDTO revisionSuspencionDTO1 =new RevisionSuspencionDTO();
+            revisionSuspencionDTO1.setCodigo(moderadorEntity.getUsuario().getCodigo());
             revisionSuspensionService.registar(revisionSuspencionDTO);
             return ResponseEntity.ok(moderadorService.SuspenderUsuario(codigo));
 
@@ -137,6 +140,9 @@ revisionSuspencionDTO.setFechaSuspension(LocalDate.now());
             revisionSuspencionDTO.setCorreo(correo);
             revisionSuspencionDTO.setUsuario(usuario);
             enviarCorreoDisculpas(revisionSuspencionDTO);
+            RevisionSuspencionDTO revisionSuspencionDTO1 =new RevisionSuspencionDTO();
+            revisionSuspencionDTO1.setCodigo(normalEntity.getUsuario().getCodigo());
+            revisionSuspensionService.registar(revisionSuspencionDTO);
             return ResponseEntity.ok(normalService.SuspenderUsuario(codigo));
         }
         else {

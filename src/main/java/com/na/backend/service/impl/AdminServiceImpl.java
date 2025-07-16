@@ -1,12 +1,10 @@
 package com.na.backend.service.impl;
 
 import com.na.backend.dto.AdminDTO;
-import com.na.backend.dto.RevisionSuspencionDTO;
 import com.na.backend.message.UsuarioMessage;
 import com.na.backend.model.*;
 import com.na.backend.repository.AdminRepository;
 import com.na.backend.repository.LoginRepository;
-import com.na.backend.repository.ModeradorRepository;
 import com.na.backend.repository.UsuarioRepository;
 import com.na.backend.service.AdminService;
 import com.na.backend.service.ModeradorService;
@@ -14,11 +12,8 @@ import com.na.backend.service.SuspencionesService;
 import com.na.backend.service.UsuarioService;
 import com.na.backend.validator.Secuencia;
 import com.na.backend.validator.Validaciones;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 

@@ -1,12 +1,10 @@
 package com.na.backend.service.impl;
 
-import com.na.backend.model.Admin;
 import com.na.backend.model.Login;
 import com.na.backend.model.Moderador;
 import com.na.backend.model.Usuario;
 import com.na.backend.repository.LoginRepository;
 import com.na.backend.repository.ModeradorRepository;
-import com.na.backend.repository.NormalRepository;
 import com.na.backend.repository.UsuarioRepository;
 import com.na.backend.service.ModeradorService;
 import org.springframework.beans.factory.annotation.Autowired;

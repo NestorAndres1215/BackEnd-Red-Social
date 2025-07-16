@@ -19,7 +19,7 @@ import java.util.List;
 public class SuspencionesServiceImpl implements SuspencionesService {
 
     @Autowired
-    private SuspensionesRepository suspensionesRepository;
+    private  SuspensionesRepository suspensionesRepository;
 
 
 

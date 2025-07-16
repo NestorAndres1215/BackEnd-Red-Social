@@ -50,24 +50,10 @@ public class NormalServiceImpl implements NormalService {
     }
 
     @Override
-    public List<Normal> listarUsuarioNormalActivos() {
-        return normalRepository.listarNormalesActivados();
+    public List<Normal> obtenerNormalesPorEstado(String estado) {
+        return normalRepository.listarNormalesPorEstado(estado);
     }
 
-    @Override
-    public List<Normal> listarUsuarioNormalDesactivos() {
-        return normalRepository.listarNormalesInactivos();
-    }
-
-    @Override
-    public List<Normal> listarUsuarioNormalSuspendidos() {
-        return normalRepository.listarNormalesSuspendidos();
-    }
-
-    @Override
-    public List<Normal> listarUsuarioNormalInhabilitados() {
-        return normalRepository.listarNormalesInabilitado();
-    }
 
     @Override
     public Normal Registro(NormalDTO normalDTO) throws Exception {

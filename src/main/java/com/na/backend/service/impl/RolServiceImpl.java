@@ -1,10 +1,8 @@
 package com.na.backend.service.impl;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.na.backend.model.Rol;
 import com.na.backend.repository.RolRepository;
 import com.na.backend.service.RolService;

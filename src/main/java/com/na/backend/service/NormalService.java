@@ -12,14 +12,7 @@ import java.util.Optional;
 
 public interface NormalService {
     List<Normal> obtenerNormalesPorUsuarioActivo(String username);
-    List<Normal> listarUsuarioNormalActivos();
-
-    List<Normal> listarUsuarioNormalDesactivos();
-
-    List<Normal> listarUsuarioNormalSuspendidos();
-
-    List<Normal> listarUsuarioNormalInhabilitados();
-
+    List<Normal> obtenerNormalesPorEstado(String estado);
     Normal Registro(NormalDTO normalDTO) throws Exception;
 
     Normal Actualizar(NormalDTO normalDTO);

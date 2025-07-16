@@ -1,9 +1,8 @@
 package com.na.backend.controller;
 
 
-import com.na.backend.dto.AdminDTO;
+
 import com.na.backend.dto.NormalDTO;
-import com.na.backend.model.Admin;
 import com.na.backend.model.Normal;
 import com.na.backend.service.NormalService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,17 +42,27 @@ public class NormalController {
 
     @GetMapping("/listar/activo")
     public List<Normal> listarActivados() {
-        return normalService.listarUsuarioNormalActivos();
+        return normalService.obtenerNormalesPorEstado("ACTIVO");
     }
 
     @GetMapping("/listar/inactivo")
     public List<Normal> listarDesactivados() {
-        return normalService.listarUsuarioNormalDesactivos();
+        return normalService.obtenerNormalesPorEstado("INACTIVO");
     }
 
     @GetMapping("/listar/suspendido")
     public List<Normal> listarSuspendidos() {
-        return normalService.listarUsuarioNormalSuspendidos();
+        return normalService.obtenerNormalesPorEstado("SUSPENDIDO");
+    }
+
+    @GetMapping("/listar/bloqueado")
+    public List<Normal> listarBloqueado() {
+        return normalService.obtenerNormalesPorEstado("BLOQUEADO");
+    }
+
+    @GetMapping("/listar/inhabilito")
+    public List<Normal> listarInhabilitado() {
+        return normalService.obtenerNormalesPorEstado("INHABILITADO");
     }
 
     @GetMapping("/listar/{username}")
