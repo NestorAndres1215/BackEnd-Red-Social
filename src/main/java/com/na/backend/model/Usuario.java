@@ -1,29 +1,37 @@
 package com.na.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "usuario")
 public class Usuario {
+    
     @Id
     @Column(name = "us_codigo")
-    private String codigo; // Código único del usuario
+    private String codigo;
 
     @Column(name = "us_usuario", nullable = false)
-    private String username; // Nombre de usuario
+    private String username; 
 
     @Column(name = "us_correo", nullable = false)
-    private String correo; // Correo electrónico del usuario
+    private String correo; 
 
     @Column(name = "us_telefono", nullable = false)
-    private String telefono; // Teléfono del usuario
-
+    private String telefono; 
+    
     @Column(name = "us_contra", nullable = false)
-    private String password; // Contraseña encriptada
+    private String password;
 
     @Column(name = "us_estado", nullable = false)
-    private String estado; // Estado del usuario (activo/inactivo)
+    private String estado; 
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "us_rol", referencedColumnName = "tr_codigo")
@@ -43,7 +51,6 @@ public class Usuario {
                 '}';
     }
 
-    // Getters y Setters
     public String getCodigo() {
         return codigo;
     }
@@ -99,8 +106,8 @@ public class Usuario {
     public void setRol(String codigoRol) {
         if (codigoRol != null) {
             Rol rol = new Rol();
-            rol.setCodigo(codigoRol); // Crear un objeto Rol con el código
-            this.rol = rol; // Asignar el objeto Rol al usuario
+            rol.setCodigo(codigoRol);
+            this.rol = rol; 
         }
     }
 

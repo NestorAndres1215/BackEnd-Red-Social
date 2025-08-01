@@ -2,7 +2,6 @@ package com.na.backend.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,6 +13,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "moderador")
 public class Moderador {
+
     @Id
     @Column(name = "mod_codigo")
     private String codigo;
@@ -42,10 +42,9 @@ public class Moderador {
     @Column(name = "mod_fechaRegistro")
     private LocalDate fechaRegistro;
 
-    // Genero
     @Column(name = "mod_genero")
     private String genero;
-    // Ultimo Acceso
+
     @Column(name = "mod_ultimo_acceso")
     private LocalDateTime ultimoAcceso;
 
@@ -56,7 +55,7 @@ public class Moderador {
     public Moderador() {
     }
 
-    public Moderador(String codigo, String nombre, String apellido, String correo, String telefono,Integer edad,
+    public Moderador(String codigo, String nombre, String apellido, String correo, String telefono, Integer edad,
             LocalDate fechaNacimiento, String estado, LocalDate fechaRegistro, String genero,
             LocalDateTime ultimoAcceso, Usuario usuario) {
         this.codigo = codigo;
@@ -185,9 +184,9 @@ public class Moderador {
 
     public void setUsuario(String codigoUsuario) {
         if (codigoUsuario != null) {
-            Usuario usuario = new Usuario(); // Crear un objeto Usuario
-            usuario.setCodigo(codigoUsuario); // Asignar el código al usuario
-            this.usuario = usuario; // Asignarlo al administrador
+            Usuario usuario = new Usuario();
+            usuario.setCodigo(codigoUsuario);
+            this.usuario = usuario;
         }
     }
 

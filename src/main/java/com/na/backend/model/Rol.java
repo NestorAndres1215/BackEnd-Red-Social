@@ -1,6 +1,9 @@
 package com.na.backend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "rol")
@@ -13,7 +16,6 @@ public class Rol {
     @Column(name = "tr_nombre", nullable = false, length = 100)
     private String nombre;
 
-    // Constructors
     public Rol() {
     }
 
@@ -22,7 +24,6 @@ public class Rol {
         this.nombre = nombre;
     }
 
-    // Getters and Setters
     public String getCodigo() {
         return codigo;
     }

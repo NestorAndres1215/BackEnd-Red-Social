@@ -1,9 +1,7 @@
 package com.na.backend.service;
 
 
-
-import com.na.backend.dto.NormalDTO;
-import com.na.backend.model.Admin;
+import com.na.backend.dto.request.NormalRequestDTO;
 import com.na.backend.model.Login;
 import com.na.backend.model.Normal;
 
@@ -11,11 +9,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface NormalService {
+    
     List<Normal> obtenerNormalesPorUsuarioActivo(String username);
-    List<Normal> obtenerNormalesPorEstado(String estado);
-    Normal Registro(NormalDTO normalDTO) throws Exception;
 
-    Normal Actualizar(NormalDTO normalDTO);
+    List<Normal> obtenerNormalesPorEstado(String estado);
+
+    Normal Registro(NormalRequestDTO normalDTO) throws Exception;
+
+    Normal Actualizar(NormalRequestDTO normalDTO);
 
     String obtenerUltimoCodigoUsuario();
 
@@ -26,9 +27,10 @@ public interface NormalService {
     boolean ExistePorTelefono(String telefono);
 
     Normal SuspenderUsuario(String usuarioCodigo);
+
     Normal DesactivarUsuario(String usuarioCodigo);
 
-    Login ActivarUsuario(String usuarioCodigo);
+    void ActivarUsuario(String usuarioCodigo);
 
     Login BloquearUsuario(String usuarioCodigo);
 

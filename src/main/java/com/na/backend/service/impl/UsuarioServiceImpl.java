@@ -4,46 +4,46 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import com.na.backend.dto.RevisionSuspencionDTO;
+import com.na.backend.dto.request.RevisionSuspencionRequestDTO;
 import com.na.backend.model.*;
 import com.na.backend.service.*;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+
+import jakarta.mail.MessagingException;
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.na.backend.repository.LoginRepository;
 import com.na.backend.repository.UsuarioRepository;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-    @Lazy
-    @Autowired
-    private AdminService adminService;
+    private final UsuarioRepository usuarioRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final LoginRepository loginRepository;
+    private final NormalService normalService;
+    private final AdminService adminService;
+    private final ModeradorService moderadorService;
+    private final EmailService emailService;
+    private final RevisionSuspensionService revisionSuspensionService;
 
-    @Lazy
-    @Autowired
-    private NormalService normalService;
-
-    @Lazy
-    @Autowired
-    private ModeradorService moderadorService;
-
-    @Autowired
-    private JavaMailSender javaMailSender;
-
-    @Autowired
-    private SuspencionesService suspencionesService;
-
-    @Autowired
-    private RevisionSuspensionService revisionSuspensionService;
-
-
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
+            LoginRepository loginRepository, AdminService adminService, NormalService normalService,
+            ModeradorService moderadorService, EmailService emailService,
+            RevisionSuspensionService revisionSuspensionService) {
+        this.usuarioRepository = usuarioRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.loginRepository = loginRepository;
+        this.adminService = adminService;
+        this.normalService = normalService;
+        this.moderadorService = moderadorService;
+        this.emailService = emailService;
+        this.revisionSuspensionService = revisionSuspensionService;
+    }
 
     @Override
     public String obtenerUltimoCodigoUsuario() {
@@ -53,6 +53,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public List<Usuario> findByUsername(String username) {
         return usuarioRepository.findByUsername(username);
+    }
+
+    @Override
+    public Optional<Usuario> listarCodigo(String codigo) {
+        return usuarioRepository.findById(codigo);
     }
 
     @Override
@@ -66,143 +71,155 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public ResponseEntity<?> validacionBloqueo(String username) {
-        List<Usuario> usuarios = usuarioRepository.findByUsername(username);
+    public Login validacionBloqueo(String username) {
 
-        if (usuarios.isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Usuario no encontrado");
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByUsername(username).stream().findFirst();
+
+        if (optionalUsuario.isEmpty()) {
+            throw new EntityNotFoundException("Usuario no encontrado");
         }
+        Usuario usuario = optionalUsuario.get();
+        String userRole = usuario.getRol().getNombre().toUpperCase();
 
-        Usuario usuario = usuarios.get(0); // suponiendo que username es único
-        String userRole = usuario.getRol().getNombre();
-
-        if ("ADMIN".equalsIgnoreCase(userRole)) {
-            return ResponseEntity.ok(adminService.BloquearUsuario(username));
-        } else if ("MODERADOR".equalsIgnoreCase(userRole)) {
-
-            return ResponseEntity.ok("Usuario MODERADOR habilitado");
-        } else if ("NORMAL".equalsIgnoreCase(userRole)) {
-
-            return ResponseEntity.ok(normalService.BloquearUsuario(username));
-        } else {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Rol de usuario no reconocido: " + userRole);
+        switch (userRole) {
+            case "ADMIN":
+                return adminService.BloquearUsuario(username);
+            case "MODERADOR":
+                return null;
+            case "NORMAL":
+                return normalService.BloquearUsuario(username);
+            default:
+                throw new IllegalArgumentException("Rol no reconocido: " + userRole);
         }
     }
 
     @Override
-    public ResponseEntity<?> validacionSuspender(String codigo, String rol)  {
-        String asunto = "Tu cuenta ha sido suspendida temporalmente";
-        String motivo = "Hemos detectado que tu cuenta ha incumplido una o más normas establecidas en nuestros Términos y Condiciones. Por esta razón, se ha procedido con la suspensión temporal del acceso.";
-        Moderador moderador =moderadorService.obtenerModeradorAleatorioActivo();
+    public Object validacionSuspender(String codigo, String rol) throws MessagingException {
 
-        RevisionSuspencionDTO revisionSuspencionDTO = new RevisionSuspencionDTO();
+        String asunto = "Tu cuenta ha sido suspendida temporalmente";
+        String motivo = "Hemos detectado que tu cuenta ha incumplido una o más normas establecidas...";
+
+        Moderador moderador = moderadorService.obtenerModeradorAleatorioActivo();
+
+        RevisionSuspencionRequestDTO revisionSuspencionDTO = new RevisionSuspencionRequestDTO();
         revisionSuspencionDTO.setCodigo(codigo);
         revisionSuspencionDTO.setAsunto(asunto);
         revisionSuspencionDTO.setModerador(moderador.getCodigo());
         revisionSuspencionDTO.setMotivo(motivo);
-revisionSuspencionDTO.setFechaSuspension(LocalDate.now());
+        revisionSuspencionDTO.setFechaSuspension(LocalDate.now());
 
         if ("ADMIN".equalsIgnoreCase(rol)) {
             Optional<Admin> adminOptional = adminService.findById(codigo);
             Admin admin = adminOptional.get();
-            String correo=admin.getCorreo();
-            String usuario=admin.getUsuario().getUsername();
+            String correo = admin.getCorreo();
+            String usuario = admin.getUsuario().getUsername();
             revisionSuspencionDTO.setCorreo(correo);
             revisionSuspencionDTO.setUsuario(usuario);
-            enviarCorreoDisculpas(revisionSuspencionDTO);
-            RevisionSuspencionDTO revisionSuspencionDTO1 =new RevisionSuspencionDTO();
-            revisionSuspencionDTO1.setCodigo(admin.getUsuario().getCodigo());
+            revisionSuspencionDTO.setCodigo(admin.getUsuario().getCodigo());
             revisionSuspensionService.registar(revisionSuspencionDTO);
-            return ResponseEntity.ok(adminService.SuspenderUsuario(codigo));
+            emailService.enviarCorreoSuspencion(revisionSuspencionDTO);
+            return normalService.SuspenderUsuario(codigo);
 
         } else if ("MODERADOR".equalsIgnoreCase(rol)) {
             Optional<Moderador> moderadorOptional = moderadorService.findById(codigo);
             Moderador moderadorEntity = moderadorOptional.get();
-            String correo=moderadorEntity.getCorreo();
-            String usuario=moderadorEntity.getUsuario().getUsername();
+            String correo = moderadorEntity.getCorreo();
+            String usuario = moderadorEntity.getUsuario().getUsername();
             revisionSuspencionDTO.setCorreo(correo);
             revisionSuspencionDTO.setUsuario(usuario);
-            enviarCorreoDisculpas(revisionSuspencionDTO);
-            RevisionSuspencionDTO revisionSuspencionDTO1 =new RevisionSuspencionDTO();
-            revisionSuspencionDTO1.setCodigo(moderadorEntity.getUsuario().getCodigo());
-            revisionSuspensionService.registar(revisionSuspencionDTO);
-            return ResponseEntity.ok(moderadorService.SuspenderUsuario(codigo));
+            revisionSuspencionDTO.setCodigo(moderadorEntity.getUsuario().getCodigo());
 
-        }else if ("NORMAL".equalsIgnoreCase(rol)) {
+            revisionSuspensionService.registar(revisionSuspencionDTO);
+            emailService.enviarCorreoSuspencion(revisionSuspencionDTO);
+            return normalService.SuspenderUsuario(codigo);
+
+        } else if ("NORMAL".equalsIgnoreCase(rol)) {
             Optional<Normal> normalOptional = normalService.findById(codigo);
             Normal normalEntity = normalOptional.get();
-            String correo=normalEntity.getCorreo();
-            String usuario=normalEntity.getUsuario().getUsername();
+            String correo = normalEntity.getCorreo();
+            String usuario = normalEntity.getUsuario().getUsername();
             revisionSuspencionDTO.setCorreo(correo);
             revisionSuspencionDTO.setUsuario(usuario);
-            enviarCorreoDisculpas(revisionSuspencionDTO);
-            RevisionSuspencionDTO revisionSuspencionDTO1 =new RevisionSuspencionDTO();
-            revisionSuspencionDTO1.setCodigo(normalEntity.getUsuario().getCodigo());
+            revisionSuspencionDTO.setCodigo(normalEntity.getUsuario().getCodigo());
+
             revisionSuspensionService.registar(revisionSuspencionDTO);
-            return ResponseEntity.ok(normalService.SuspenderUsuario(codigo));
-        }
-        else {
+            emailService.enviarCorreoSuspencion(revisionSuspencionDTO);
+            return normalService.SuspenderUsuario(codigo);
+        } else {
             // Rol no permitido
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("No tienes permisos para suspender usuarios.");
         }
+
     }
 
+    @Override
+    public Usuario regUsuario(String codigo, String username, String password, String correo, String telefono,
+            String rol) {
 
+        Usuario usuario = new Usuario();
+        usuario.setCodigo(codigo);
+        usuario.setUsername(username);
+        usuario.setPassword(password);
+        usuario.setEstado("ACTIVO");
+        usuario.setTelefono(telefono);
+        usuario.setRol(rol);
+        usuario.setCorreo(correo);
 
-    private void enviarCorreoDisculpas(RevisionSuspencionDTO revisionSuspencionDTO) {
+        return usuarioRepository.save(usuario);
 
-        try {
-            String destinatario = revisionSuspencionDTO.getCorreo();
-            String asunto = revisionSuspencionDTO.getAsunto(); // Ej: "Tu cuenta ha sido suspendida"
-            String usuario = revisionSuspencionDTO.getUsuario();
-            LocalDate fecha = revisionSuspencionDTO.getFechaSuspension();
-            String motivo = revisionSuspencionDTO.getMotivo(); // Si tienes un campo motivo
+    }
 
-            String contenidoHtml = """
-        <html>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f5f5f5; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh;">
-            <div style="background-color: #fff; padding: 20px; border: 1px solid #ccc; width: 80%%; max-width: 600px; text-align: center; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    @Override
+    public Login regLogin(String codigo, String username, String password, String correo, String telefono, String rol) {
 
-                <h2 style="color: #c0392b;">Hola, %s</h2>
-                <p style="color: #7f8c8d;">
-                    Te informamos que tu cuenta en <strong>Social Like</strong> ha sido <strong>suspendida temporalmente</strong>.
-                </p>
-                <p style="color: #7f8c8d;">
-                    <strong>Motivo:</strong> %s<br>
-                    <strong>Fecha de suspensión:</strong> %s
-                </p>
-                <p style="color: #7f8c8d;">
-                    Esta acción se ha tomado en base a nuestros Términos y Condiciones. Si consideras que esto es un error, puedes comunicarte con el soporte para iniciar un proceso de revisión.
-                </p>
-                <p style="color: #7f8c8d;">
-                    Gracias,<br>
-                    El equipo de Social Like
-                </p>
-                <p style="font-size: 12px; color: #7f8c8d;">
-                    No respondas a este correo. Este mensaje fue generado automáticamente.
-                </p>
-            </div>
-        </body>
-        </html>
-        """.formatted(usuario, motivo, fecha.toString());
+        Login login = new Login();
+        login.setCodigo(codigo);
+        login.setUsername(username);
+        login.setPassword(bCryptPasswordEncoder.encode(password));
+        login.setEstado("ACTIVO");
+        login.setRol(rol);
+        login.setCorreo(correo);
+        login.setTelefono(telefono);
 
-            MimeMessage mensaje = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mensaje, true);
-            helper.setTo(destinatario);
-            helper.setSubject(asunto);
-            helper.setText(contenidoHtml, true); // true = contenido HTML
+        return loginRepository.save(login);
 
-            javaMailSender.send(mensaje);
+    }
 
-        } catch (Exception e) {
-            throw new RuntimeException("Error al enviar el correo de suspensión: " + e.getMessage(), e);
-        }
+    @Override
+    public Usuario actUsuario(String codigo, String username, String password, String correo, String telefono,
+            String rol) {
+
+        Usuario usuario = usuarioRepository.findById(codigo)
+                .orElseThrow(() -> new RuntimeException(
+                        "El usuario con código " + codigo + " no existe."));
+
+        usuario.setUsername(username);
+        usuario.setPassword(bCryptPasswordEncoder.encode(password));
+        usuario.setCorreo(correo);
+        usuario.setEstado("ACTIVO");
+        usuario.setTelefono(telefono);
+        usuario.setRol(rol);
+
+        return usuarioRepository.save(usuario);
+
+    }
+
+    @Override
+    public Login actLogin(String codigo, String username, String password, String correo, String telefono, String rol) {
+
+        Login login = loginRepository.findById(codigo)
+                .orElseThrow(() -> new RuntimeException(
+                        "El login con código " + codigo + " no existe."));
+
+        login.setUsername(username);
+        login.setPassword(bCryptPasswordEncoder.encode(password));
+        login.setCorreo(correo);
+        login.setTelefono(telefono);
+        login.setEstado(rol);
+        login.setEstado("ACTIVO");
+
+        return loginRepository.save(login);
     }
 
 }
-

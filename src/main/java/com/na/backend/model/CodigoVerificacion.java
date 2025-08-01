@@ -11,23 +11,28 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "codigo_verificacion")
 public class CodigoVerificacion {
+
     @Id
     @Column(name = "cv_codigo")
     private String codigo;
+
     @Column(name = "cv_correo")
     private String correo;
+
     @Column(name = "cv_usuario")
     private String usuario;
+
     @Column(name = "cv_codigo_verificado")
     private String codigo_verificacion;
+
     @Column(name = "cv_fecha_generacion")
     private LocalDate fecha_generacion;
+    
     @Column(name = "cv_hora_generacion")
     private LocalTime hora_generacion;
 
     public CodigoVerificacion() {
     }
-
 
     @Override
     public String toString() {
@@ -41,7 +46,8 @@ public class CodigoVerificacion {
                 '}';
     }
 
-    public CodigoVerificacion(String codigo, String correo, String usuario, String codigo_verificacion, LocalDate fecha_generacion, LocalTime hora_generacion) {
+    public CodigoVerificacion(String codigo, String correo, String usuario, String codigo_verificacion,
+            LocalDate fecha_generacion, LocalTime hora_generacion) {
         this.codigo = codigo;
         this.correo = correo;
         this.usuario = usuario;

@@ -1,9 +1,6 @@
 package com.na.backend.model;
 
-
 import jakarta.persistence.*;
-
-import javax.lang.model.element.Name;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -34,7 +31,8 @@ public class Suspensiones {
     @JoinColumn(name = "sus_usuario", referencedColumnName = "us_codigo")
     private Usuario usuario;
 
-    public Suspensiones(String codigo, LocalDate fecha_suspension, LocalDate fecha_expiracion, String motivo_corto, LocalTime hora_suspension, String detalle_motivo, Usuario usuario) {
+    public Suspensiones(String codigo, LocalDate fecha_suspension, LocalDate fecha_expiracion, String motivo_corto,
+            LocalTime hora_suspension, String detalle_motivo, Usuario usuario) {
         this.codigo = codigo;
         this.fecha_suspension = fecha_suspension;
         this.fecha_expiracion = fecha_expiracion;
@@ -114,9 +112,9 @@ public class Suspensiones {
 
     public void setUsuario(String codigoUsuario) {
         if (codigoUsuario != null) {
-            Usuario usuario = new Usuario(); // Crear un objeto Usuario
-            usuario.setCodigo(codigoUsuario); // Asignar el código al usuario
-            this.usuario = usuario; // Asignarlo al administrador
+            Usuario usuario = new Usuario();
+            usuario.setCodigo(codigoUsuario);
+            this.usuario = usuario;
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.na.backend.controller;
 
-import com.na.backend.dto.CodigoVerificacioDTO;
-import com.na.backend.dto.VerificacionDTO;
+import com.na.backend.dto.request.CodigoVerificacioRequestDTO;
+import com.na.backend.dto.request.VerificacionRequestDTO;
 import com.na.backend.service.CodigoVerificacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,21 +17,17 @@ public class CodigoVerificacionController {
     private CodigoVerificacionService codigoVerificacionService;
 
     @PostMapping("/enviar-codigo")
-    public ResponseEntity<?> guardarAdmin(@RequestBody VerificacionDTO verificacionDTO) throws Exception {
+    public ResponseEntity<?> guardarAdmin(@RequestBody VerificacionRequestDTO verificacionDTO) throws Exception {
         try {
-
             return ResponseEntity.ok(codigoVerificacionService.generarYGuardarCodigo(verificacionDTO));
-
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());
         }
     }
 
-
     @PostMapping("/verificar-codigo")
-    public ResponseEntity<?> verificar(@RequestBody CodigoVerificacioDTO codigoVerificacioDTO) {
+    public ResponseEntity<?> verificar(@RequestBody CodigoVerificacioRequestDTO codigoVerificacioDTO) {
         try {
             return ResponseEntity.ok(codigoVerificacionService.verificar(codigoVerificacioDTO));
         } catch (Exception e) {

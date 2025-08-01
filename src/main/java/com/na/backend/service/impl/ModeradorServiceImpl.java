@@ -7,6 +7,7 @@ import com.na.backend.repository.LoginRepository;
 import com.na.backend.repository.ModeradorRepository;
 import com.na.backend.repository.UsuarioRepository;
 import com.na.backend.service.ModeradorService;
+import com.na.backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ public class ModeradorServiceImpl implements ModeradorService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     @Override
     public Moderador obtenerModeradorAleatorioActivo() {
@@ -42,7 +46,7 @@ public class ModeradorServiceImpl implements ModeradorService {
         if (moderadorOptional.isPresent()) {
             Moderador moderador = moderadorOptional.get();
 
-            Optional<Usuario> usuario = usuarioRepository.findById(moderador.getUsuario().getCodigo());
+            Optional<Usuario> usuario = usuarioService.listarCodigo(moderador.getUsuario().getCodigo());
             if (usuario.isPresent()) {
                 Usuario usuarioEntity = usuario.get();
                 usuarioEntity.setEstado("SUSPENDIDO");

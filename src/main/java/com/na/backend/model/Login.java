@@ -3,13 +3,15 @@ package com.na.backend.model;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.na.backend.security.Authority;
+import com.na.backend.security.service.Authority;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "login")
@@ -18,16 +20,22 @@ public class Login implements UserDetails {
     @Id
     @Column(name = "ul_codigo")
     private String codigo;
+
     @Column(name = "ul_usuario")
     private String username;
+
     @Column(name = "ul_contra")
     private String password;
+
     @Column(name = "ul_correo")
     private String correo;
+
     @Column(name = "ul_telefono")
     private String telefono;
+
     @Column(name = "ul_rol")
     private String rol;
+    
     @Column(name = "ul_estado", nullable = false)
     private String estado;
 

@@ -60,8 +60,6 @@ public class Menu {
     public Menu() {
     }
 
-    // Getters and setters
-
     public String getId() {
         return id;
     }

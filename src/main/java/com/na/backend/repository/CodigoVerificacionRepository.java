@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CodigoVerificacionRepository extends JpaRepository<CodigoVerificacion,String> {
+public interface CodigoVerificacionRepository extends JpaRepository<CodigoVerificacion, String> {
+
     Optional<CodigoVerificacion> findByCorreo(String correo);
 
     @Query(value = "SELECT MAX(cv_codigo) FROM Codigo_Verificacion", nativeQuery = true)

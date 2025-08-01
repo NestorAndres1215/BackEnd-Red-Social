@@ -1,9 +1,6 @@
 package com.na.backend.service.impl;
 
-
-import com.na.backend.dto.NormalDTO;
-import com.na.backend.message.UsuarioMessage;
-import com.na.backend.model.Admin;
+import com.na.backend.dto.request.NormalRequestDTO;
 import com.na.backend.model.Login;
 import com.na.backend.model.Normal;
 import com.na.backend.model.Usuario;
@@ -12,11 +9,14 @@ import com.na.backend.repository.NormalRepository;
 import com.na.backend.repository.UsuarioRepository;
 import com.na.backend.service.NormalService;
 import com.na.backend.service.UsuarioService;
-import com.na.backend.validator.Secuencia;
-import com.na.backend.validator.Validaciones;
+import com.na.backend.util.SecuenciaUtil;
+import com.na.backend.util.ValidacionUtil;
+
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -38,12 +38,6 @@ public class NormalServiceImpl implements NormalService {
     @Autowired
     private LoginRepository loginRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private Validaciones validaciones;
-
     @Override
     public List<Normal> obtenerNormalesPorUsuarioActivo(String username) {
         return normalRepository.buscarPorUsuarioYEstadoActivo(username);
@@ -52,105 +46,6 @@ public class NormalServiceImpl implements NormalService {
     @Override
     public List<Normal> obtenerNormalesPorEstado(String estado) {
         return normalRepository.listarNormalesPorEstado(estado);
-    }
-
-
-    @Override
-    public Normal Registro(NormalDTO normalDTO) throws Exception {
-        try{
-            validarNormal(normalDTO);
-            String codigoUsuario = obtenerUltimoCodigoUsuario();
-            String ultimoCodigo = Secuencia.incrementarSecuencia(codigoUsuario);
-            String codigoNormal = ObtenerUltimoCodigoNormal();
-            String ultimoCodigoNormal = Secuencia.incrementarSecuencia(codigoNormal);
-            Login login = new Login();
-            login.setCodigo(ultimoCodigo);
-            login.setUsername(normalDTO.getUsername());
-            login.setPassword(bCryptPasswordEncoder.encode(normalDTO.getPassword()));
-            login.setEstado("ACTIVO");
-            login.setRol("NORMAL");
-            login.setCorreo(normalDTO.getCorreo());
-            login.setTelefono(normalDTO.getTelefono());
-
-
-            Usuario usuario = new Usuario();
-            usuario.setCodigo(ultimoCodigo);
-            usuario.setUsername(normalDTO.getUsername());
-            usuario.setPassword(normalDTO.getPassword()); // Podrías encriptarla aquí también
-            usuario.setEstado("ACTIVO");
-            usuario.setTelefono(normalDTO.getTelefono());
-            usuario.setRol("0003");
-            usuario.setCorreo(normalDTO.getCorreo());
-
-
-            Normal normal = new Normal();
-            normal.setCodigo(ultimoCodigoNormal);
-            normal.setNombre(normalDTO.getNombre());
-            normal.setApellido(normalDTO.getApellido());
-            normal.setCorreo(normalDTO.getCorreo());
-            normal.setTelefono(normalDTO.getTelefono());
-            normal.setEdad(normalDTO.getEdad());
-            normal.setFechaNacimiento(normalDTO.getFechaNacimiento());
-            normal.setEstado("ACTIVO");
-            normal.setFechaRegistro(LocalDate.now());
-            normal.setGenero(normalDTO.getGenero());
-            normal.setNacionalidad(normalDTO.getNacionalidad());
-            normal.setUsuario(ultimoCodigo);
-            loginRepository.save(login);
-            usuarioRepository.save(usuario);
-            return normalRepository.save(normal);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("Error al registrar el normal: " + e.getMessage(), e);
-        }
-
-    }
-
-    @Override
-    public Normal Actualizar(NormalDTO normalDTO) {
-        try{
-
-                Optional<Normal> optionalNormal = normalRepository.findById(normalDTO.getCodigoNormal());
-                if (!optionalNormal.isPresent()) {
-                    throw new IllegalArgumentException(
-                            "El administrador con el código " + normalDTO.getCodigoNormal() + " no existe.");
-                }
-                Normal normal =optionalNormal.get();
-                normal.setNombre(normalDTO.getNombre());
-                normal.setApellido(normalDTO.getApellido());
-                normal.setCorreo(normalDTO.getCorreo());
-                normal.setTelefono(normalDTO.getTelefono());
-                normal.setEdad(normalDTO.getEdad());
-                normal.setFechaNacimiento(normalDTO.getFechaNacimiento());
-                normal.setEstado("ACTIVO");
-                normal.setGenero(normalDTO.getGenero());
-                normal.setNacionalidad(normalDTO.getNacionalidad());
-                Usuario usuario = usuarioRepository.findById(normalDTO.getCodigoUsuario())
-                        .orElseThrow(() -> new RuntimeException(
-                                "El usuario con código " + normalDTO.getCodigoUsuario() + " no existe."));
-                usuario.setUsername(normalDTO.getUsername());
-                usuario.setPassword(bCryptPasswordEncoder.encode(normalDTO.getPassword()));
-                usuario.setCorreo(normal.getCorreo());
-                usuario.setEstado("ACTIVO");
-                usuario.setTelefono(normalDTO.getTelefono());
-                usuario.setRol("0003");
-
-                Login login = loginRepository.findById(normalDTO.getCodigoUsuario())
-                        .orElseThrow(() -> new RuntimeException(
-                                "El login con código " + normalDTO.getCodigoUsuario() + " no existe."));
-                login.setUsername(normalDTO.getUsername());
-                login.setPassword(bCryptPasswordEncoder.encode(normalDTO.getPassword()));
-                login.setCorreo(normalDTO.getCorreo());
-                login.setTelefono(normalDTO.getTelefono());
-                login.setEstado("ACTIVO");
-                loginRepository.save(login);
-                usuarioRepository.save(usuario);
-                return normalRepository.save(normal);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     @Override
@@ -177,7 +72,6 @@ public class NormalServiceImpl implements NormalService {
     public Normal SuspenderUsuario(String usuarioCodigo) {
 
         Optional<Normal> normalOptional = normalRepository.findById(usuarioCodigo);
-
 
         if (normalOptional.isPresent()) {
             Normal normal = normalOptional.get();
@@ -209,7 +103,7 @@ public class NormalServiceImpl implements NormalService {
     }
 
     @Override
-    public Login ActivarUsuario(String usuarioCodigo) {
+    public void ActivarUsuario(String usuarioCodigo) {
 
         Optional<Login> login = loginRepository.findById(usuarioCodigo);
         if (login.isPresent()) {
@@ -217,7 +111,7 @@ public class NormalServiceImpl implements NormalService {
 
             Optional<Normal> normal = normalRepository.findByCorreo(login.get().getCorreo());
 
-            if(normal.isPresent()){
+            if (normal.isPresent()) {
                 Normal normalEntity = normal.get();
                 normalEntity.setEstado("ACTIVO");
                 normalRepository.save(normalEntity);
@@ -230,13 +124,11 @@ public class NormalServiceImpl implements NormalService {
                 usuarioRepository.save(usuarioEntity);
             }
             loginEntity.setEstado("ACTIVO");
-            return loginRepository.save(loginEntity);
-        }
-        else {
-            throw new IllegalArgumentException(UsuarioMessage.ADMIN_NO_EXISTE.getMensaje());
+            loginRepository.save(loginEntity);
+        } else {
+            throw new IllegalArgumentException("No se pudo activar");
         }
     }
-
 
     @Override
     public Login BloquearUsuario(String usuarioCodigo) {
@@ -248,7 +140,7 @@ public class NormalServiceImpl implements NormalService {
             login.setEstado("BLOQUEADO");
             Optional<Normal> normal = normalRepository.findByCorreo(login.getCorreo());
             System.out.print(normal);
-            if(normal.isPresent()){
+            if (normal.isPresent()) {
                 Normal normal1 = normal.get();
                 normal1.setEstado("BLOQUEADO");
                 normalRepository.save(normal1);
@@ -264,7 +156,7 @@ public class NormalServiceImpl implements NormalService {
         }
 
         else {
-            throw new IllegalArgumentException(UsuarioMessage.ADMIN_NO_EXISTE.getMensaje());
+            throw new IllegalArgumentException("Nose pudo bloquear");
         }
 
     }
@@ -274,29 +166,93 @@ public class NormalServiceImpl implements NormalService {
         return normalRepository.findById(codigo);
     }
 
-    private boolean validarNormal(NormalDTO normalDTO) {
+    private boolean validarNormal(NormalRequestDTO normalDTO) {
 
-        if (usuarioService.usuarioExistePorUsername(normalDTO.getUsername())) {
+        if (usuarioService.usuarioExistePorUsername(normalDTO.getUsernameNormal())) {
             throw new IllegalArgumentException("USUARIO YA EXISTE");
         }
-        if (ExistePorEmail(normalDTO.getCorreo())) {
+        if (ExistePorEmail(normalDTO.getCorreoNormal())) {
             throw new IllegalArgumentException("CORREO YA EXISTE");
         }
 
-        if (ExistePorTelefono(normalDTO.getTelefono())) {
+        if (ExistePorTelefono(normalDTO.getTelefonoNormal())) {
             throw new IllegalArgumentException("TELEFONO YA EXISTE");
         }
-        if (!validaciones.validarTelefono(normalDTO.getTelefono())) {
+        if (!ValidacionUtil.esTelefonoValido(normalDTO.getTelefonoNormal())) {
             throw new IllegalArgumentException("EL TELEFONO DEBE TENER 9 DIGITOS");
         }
 
-        if (!validaciones.correoEsValido(normalDTO.getCorreo())) {
+        if (!ValidacionUtil.esCorreoValido(normalDTO.getCorreoNormal())) {
             throw new IllegalArgumentException("EL CORREO NO TIENEN FORMATO VALIDO");
         }
 
-        if (normalDTO.getEdad() < 18) {
+        if (normalDTO.getEdadNormal() < 18) {
             throw new IllegalArgumentException("EDAD NO PERMITIDA");
         }
         return ResponseEntity.ok("Validación exitosa").hasBody();
+    }
+
+    @Override
+    public Normal Registro(NormalRequestDTO normalDTO) throws Exception {
+        try {
+            validarNormal(normalDTO);
+            String codigoUsuario = obtenerUltimoCodigoUsuario();
+            String ultimoCodigo = SecuenciaUtil.generarSiguienteCodigo(codigoUsuario);
+            String codigoNormal = ObtenerUltimoCodigoNormal();
+            String ultimoCodigoNormal = SecuenciaUtil.generarSiguienteCodigo(codigoNormal);
+
+            usuarioService.regUsuario(ultimoCodigo, normalDTO.getUsernameNormal(), normalDTO.getPasswordNormal(),
+                    normalDTO.getCorreoNormal(), normalDTO.getTelefonoNormal(), "0003");
+            usuarioService.regLogin(ultimoCodigo, normalDTO.getUsernameNormal(), normalDTO.getPasswordNormal(),
+                    normalDTO.getCorreoNormal(), normalDTO.getTelefonoNormal(), "NORMAL");
+
+            Normal normal = new Normal();
+            normal.setCodigo(ultimoCodigoNormal);
+            normal.setNombre(normalDTO.getNombreNormal());
+            normal.setApellido(normalDTO.getApellidoNormal());
+            normal.setCorreo(normalDTO.getCorreoNormal());
+            normal.setTelefono(normalDTO.getTelefonoNormal());
+            normal.setEdad(normalDTO.getEdadNormal());
+            normal.setFechaNacimiento(normalDTO.getFechaNacimientoNormal());
+            normal.setEstado("ACTIVO");
+            normal.setFechaRegistro(LocalDate.now());
+            normal.setGenero(normalDTO.getGeneroNormal());
+            normal.setNacionalidad(normalDTO.getNacionalidadNormal());
+            normal.setUsuario(ultimoCodigo);
+
+            return normalRepository.save(normal);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+    }
+
+    @Override
+    public Normal Actualizar(NormalRequestDTO normalDTO) {
+
+        Optional<Normal> optionalNormal = normalRepository.findById(normalDTO.getCodigoNormal());
+        if (!optionalNormal.isPresent()) {
+            throw new IllegalArgumentException(
+                    "El administrador con el código " + normalDTO.getCodigoNormal() + " no existe.");
+        }
+
+        usuarioService.actLogin(normalDTO.getCodigoUsuario(), normalDTO.getUsernameNormal(),
+                normalDTO.getPasswordNormal(), normalDTO.getCorreoNormal(), normalDTO.getTelefonoNormal(), "NORMAL");
+
+        usuarioService.actUsuario(normalDTO.getCodigoUsuario(), normalDTO.getUsernameNormal(),
+                normalDTO.getPasswordNormal(), normalDTO.getCorreoNormal(), normalDTO.getTelefonoNormal(), "0003");
+
+        Normal normal = optionalNormal.get();
+        normal.setNombre(normalDTO.getNombreNormal());
+        normal.setApellido(normalDTO.getApellidoNormal());
+        normal.setCorreo(normalDTO.getCorreoNormal());
+        normal.setTelefono(normalDTO.getTelefonoNormal());
+        normal.setEdad(normalDTO.getEdadNormal());
+        normal.setFechaNacimiento(normalDTO.getFechaNacimientoNormal());
+        normal.setEstado("ACTIVO");
+        normal.setGenero(normalDTO.getGeneroNormal());
+        normal.setNacionalidad(normalDTO.getNacionalidadNormal());
+
+        return normalRepository.save(normal);
     }
 }

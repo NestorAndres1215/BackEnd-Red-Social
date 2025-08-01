@@ -82,12 +82,11 @@ public class Historial {
 
     public void setUsuario(String codigoUsuario) {
         if (codigoUsuario != null) {
-            Usuario usuario = new Usuario();  // Crear un objeto Usuario
-            usuario.setCodigo(codigoUsuario); // Asignar el código al usuario
-            this.usuario = usuario;           // Asignarlo al administrador
+            Usuario usuario = new Usuario();
+            usuario.setCodigo(codigoUsuario);
+            this.usuario = usuario;
         }
     }
-
 
     public String getDetalle() {
         return detalle;

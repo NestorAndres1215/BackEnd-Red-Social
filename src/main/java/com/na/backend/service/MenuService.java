@@ -6,13 +6,11 @@ import com.na.backend.model.Menu;
 import com.na.backend.model.Rol;
 
 public interface MenuService {
-    
+
     List<Menu> obtenerMenusPorRol(Rol rol);
 
-    List<Menu> menuPrimero();
+    List<Menu> listarMenuPorNiveles(Integer nivel);
 
-    List<Menu> menuSegundo();
-
-    List<Menu> menuTercero();
+    List<Menu> obtenerMenusPorRol(String rol);
 
 }

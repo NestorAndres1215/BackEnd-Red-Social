@@ -7,6 +7,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "revisiones_suspension")
 public class RevisionSuspension {
+
     @Id
     @Column(name = "rs_codigo")
     private String codigo;
@@ -28,8 +29,8 @@ public class RevisionSuspension {
     @JoinColumn(name = "rs_moderador", referencedColumnName = "mod_codigo")
     private Moderador moderador;
 
-
-    public RevisionSuspension(String codigo, LocalDate fecha_revision, String estado_revision, String observacion, Suspensiones suspensiones, Moderador moderador) {
+    public RevisionSuspension(String codigo, LocalDate fecha_revision, String estado_revision, String observacion,
+            Suspensiones suspensiones, Moderador moderador) {
         this.codigo = codigo;
         this.fecha_revision = fecha_revision;
         this.estado_revision = estado_revision;
@@ -92,8 +93,8 @@ public class RevisionSuspension {
     public void setSuspensiones(String codigo) {
         if (codigo != null) {
             Suspensiones suspensiones = new Suspensiones();
-            suspensiones.setCodigo(codigo); // Crear un objeto Rol con el código
-            this.suspensiones = suspensiones; // Asignar el objeto Rol al usuario
+            suspensiones.setCodigo(codigo);
+            this.suspensiones = suspensiones;
         }
     }
 
@@ -105,8 +106,8 @@ public class RevisionSuspension {
 
         if (codigo != null) {
             Moderador moderador = new Moderador();
-            moderador.setCodigo(codigo); // Crear un objeto Rol con el código
-            this.moderador = moderador; // Asignar el objeto Rol al usuario
+            moderador.setCodigo(codigo);
+            this.moderador = moderador;
         }
     }
 }

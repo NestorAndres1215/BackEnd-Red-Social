@@ -1,5 +1,6 @@
 package com.na.backend.controller;
 
+import com.na.backend.dto.response.RevisionResponseDTO;
 import com.na.backend.model.RevisionSuspension;
 import com.na.backend.model.Suspensiones;
 import com.na.backend.model.Usuario;
@@ -51,6 +52,14 @@ public class RevisionSuspencionController {
     public List<RevisionSuspension> listarRevision() {
         return revisionSuspensionService.listarRevision();
     }
+
+    @GetMapping("/listar/revision/{correo}")
+    public ResponseEntity<?> listarRevisionesPorCorreo(@PathVariable String correo) {
+        try {
+            List<RevisionResponseDTO> revisiones = revisionSuspensionService.revisarSuspencion(correo);
+            return ResponseEntity.ok(revisiones);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al obtener las revisiones");
+        }
+    }
 }
-
-

@@ -1,8 +1,7 @@
 package com.na.backend.controller;
 
 
-
-import com.na.backend.dto.NormalDTO;
+import com.na.backend.dto.request.NormalRequestDTO;
 import com.na.backend.model.Normal;
 import com.na.backend.service.NormalService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ public class NormalController {
     private NormalService normalService;
 
     @PostMapping("/guardar-normal")
-    public ResponseEntity<?> guardar(@RequestBody NormalDTO normalDTO) throws Exception {
+    public ResponseEntity<?> guardar(@RequestBody NormalRequestDTO normalDTO) throws Exception {
         try {
             return ResponseEntity.ok(normalService.Registro(normalDTO));
         } catch (Exception e) {
@@ -31,7 +30,7 @@ public class NormalController {
     }
 
     @PutMapping("/actualizar-normal")
-    public ResponseEntity<?> actualizar(@RequestBody NormalDTO normalDTO) throws Exception {
+    public ResponseEntity<?> actualizar(@RequestBody NormalRequestDTO normalDTO) throws Exception {
         try {
             return ResponseEntity.ok(normalService.Actualizar(normalDTO));
         } catch (Exception e) {

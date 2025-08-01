@@ -1,24 +1,38 @@
 package com.na.backend.service;
 
 import java.util.List;
+import java.util.Optional;
+
+import com.na.backend.model.Login;
 
 import com.na.backend.model.Usuario;
-import org.springframework.http.ResponseEntity;
+
+import jakarta.mail.MessagingException;
+
 
 public interface UsuarioService {
-    
-    // ultimo codigo de usuario
-     String obtenerUltimoCodigoUsuario();
 
-    // Lista usuario por username
+    String obtenerUltimoCodigoUsuario();
+
     List<Usuario> findByUsername(String username);
 
-    // validaciones de usuario existe
+    Optional<Usuario> listarCodigo(String codigo);
+
     boolean usuarioExistePorUsername(String username);
 
-    // validaciones de usuario y contraseña valida
     boolean existsByUsernameAndPassword(String username, String password);
-    ResponseEntity<?> validacionBloqueo(String username);
 
-    ResponseEntity<?> validacionSuspender(String codigo,String rol);
+    Login validacionBloqueo(String username);
+
+    Object  validacionSuspender(String codigo, String rol) throws MessagingException;
+
+ 
+
+    Usuario regUsuario(String codigo, String username, String password, String correo, String telefono, String rol);
+
+    Login regLogin(String codigo, String username, String password, String correo, String telefono, String rol);
+
+    Usuario actUsuario(String codigo, String username, String password, String correo, String telefono, String rol);
+
+    Login actLogin(String codigo, String username, String password, String correo, String telefono, String rol);
 }

@@ -1,61 +1,59 @@
 package com.na.backend.service.impl;
 
-import com.na.backend.dto.AdminDTO;
-import com.na.backend.message.UsuarioMessage;
-import com.na.backend.model.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+
+import com.na.backend.dto.request.AdminRequestDTO;
+import com.na.backend.dto.response.AdminResponseDTO;
+
+import com.na.backend.mapper.AdminMapper;
+import com.na.backend.model.Admin;
+import com.na.backend.model.Login;
+
 import com.na.backend.repository.AdminRepository;
 import com.na.backend.repository.LoginRepository;
 import com.na.backend.repository.UsuarioRepository;
 import com.na.backend.service.AdminService;
-import com.na.backend.service.ModeradorService;
-import com.na.backend.service.SuspencionesService;
 import com.na.backend.service.UsuarioService;
-import com.na.backend.validator.Secuencia;
-import com.na.backend.validator.Validaciones;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
+import com.na.backend.util.SecuenciaUtil;
+import com.na.backend.util.ValidacionUtil;
 
-import java.time.LocalDate;
-import java.util.*;
+
+
 
 @Service
-public  class AdminServiceImpl implements AdminService {
+public class AdminServiceImpl implements AdminService {
 
-    @Autowired
-    private AdminRepository adminRepository;
+    private final AdminRepository adminRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final LoginRepository loginRepository;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
+    private final AdminMapper adminMapper;
 
-    @Autowired
-    private LoginRepository loginRepository;
+    public AdminServiceImpl(AdminRepository adminRepository,
+            UsuarioRepository usuarioRepository,
+            LoginRepository loginRepository,
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private Validaciones validaciones;
-
-    @Autowired
-    private UsuarioService usuarioService;
-
-    @Autowired
-    private SuspencionesService suspencionesService;
-
-    @Autowired
-    private ModeradorService moderadorService;
+            UsuarioService usuarioService,
+            AdminMapper adminMapper) {
+        this.adminRepository = adminRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.loginRepository = loginRepository;
+        this.usuarioService = usuarioService;
+        this.adminMapper = adminMapper;
+    }
 
     @Override
     public List<Admin> getAdminsByUsuarioCodigo(String usuarioCodigo) {
         List<Admin> admins = adminRepository.findByUsuario_Codigo(usuarioCodigo);
-        // Si la lista está vacía, devolvemos null
-        if (admins.isEmpty()) {
-            return null;
-        } else {
-            return admins;
-        }
+        return admins;
     }
 
     @Override
@@ -64,102 +62,8 @@ public  class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<Admin> listarAdminsActivados() {
-        return adminRepository.listarAdminsActivados();
-    }
-
-    @Override
-    public List<Admin> listarAdminsDesactivado() {
-        return adminRepository.listarAdminsInactivos();
-    }
-
-    @Override
-    public Admin Registro(AdminDTO adminDTO) throws Exception {
-        try {
-            validarAdmin(adminDTO);
-            String codigoUsuario = obtenerUltimoCodigoUsuario();
-            String ultimoCodigo = Secuencia.incrementarSecuencia(codigoUsuario);
-            String codigoAdmin = ObtenerUltimoCodigoAdmin();
-            String ultimoCodigoAdmin = Secuencia.incrementarSecuencia(codigoAdmin);
-
-            Login login = new Login();
-            login.setCodigo(ultimoCodigo);
-            login.setUsername(adminDTO.getUsername());
-            login.setPassword(bCryptPasswordEncoder.encode(adminDTO.getPassword()));
-            login.setEstado("ACTIVO");
-            login.setRol("ADMIN");
-            login.setCorreo(adminDTO.getCorreo());
-            login.setTelefono(adminDTO.getTelefono());
-
-            Usuario usuario = new Usuario();
-            usuario.setCodigo(ultimoCodigo);
-            usuario.setUsername(adminDTO.getUsername());
-            usuario.setPassword(adminDTO.getPassword()); // Podrías encriptarla aquí también
-            usuario.setEstado("ACTIVO");
-            usuario.setTelefono(adminDTO.getTelefono());
-            usuario.setRol("0001");
-            usuario.setCorreo(adminDTO.getCorreo());
-
-            Admin admin = new Admin();
-            admin.setCodigo(ultimoCodigoAdmin);
-            admin.setNombre(adminDTO.getNombre());
-            admin.setApellido(adminDTO.getApellido());
-            admin.setTelefono(adminDTO.getTelefono());
-            admin.setCorreo(adminDTO.getCorreo());
-            admin.setEdad(adminDTO.getEdad());
-            admin.setEstado("ACTIVO");
-            admin.setUsuario(ultimoCodigo);
-            admin.setFechaNacimiento(adminDTO.getFechaNacimiento());
-            admin.setFechaRegistro(LocalDate.now());
-            loginRepository.save(login);
-            usuarioRepository.save(usuario);
-            return adminRepository.save(admin);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("Error al registrar el administrador: " + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public Admin Actualizar(AdminDTO adminDTO) {
-            System.out.print("Administradores"+adminDTO);
-        Optional<Admin> adminOptional = adminRepository.findById(adminDTO.getCodigoAdmin());
-        if (!adminOptional.isPresent()) {
-            throw new IllegalArgumentException(
-                    "El administrador con el código " + adminDTO.getCodigoAdmin() + " no existe.");
-        }
-        Admin admin = adminOptional.get();
-        admin.setNombre(adminDTO.getNombre());
-        admin.setApellido(adminDTO.getApellido());
-        admin.setTelefono(adminDTO.getTelefono());
-        admin.setFechaNacimiento(adminDTO.getFechaNacimiento());
-        admin.setEstado("ACTIVO");
-        admin.setCorreo(adminDTO.getCorreo());
-
-        Usuario usuario = usuarioRepository.findById(adminDTO.getCodigoUsuario())
-                .orElseThrow(() -> new RuntimeException(
-                        "El usuario con código " + adminDTO.getCodigoUsuario() + " no existe."));
-        usuario.setUsername(adminDTO.getUsername());
-        usuario.setPassword(bCryptPasswordEncoder.encode(adminDTO.getPassword()));
-        usuario.setCorreo(adminDTO.getCorreo());
-        usuario.setEstado("ACTIVO");
-        usuario.setTelefono(adminDTO.getTelefono());
-        usuario.setRol("0001");
-
-        Login login = loginRepository.findById(adminDTO.getCodigoUsuario())
-                .orElseThrow(() -> new RuntimeException(
-                        "El login con código " + adminDTO.getCodigoUsuario() + " no existe."));
-        login.setUsername(adminDTO.getUsername());
-        login.setPassword(bCryptPasswordEncoder.encode(adminDTO.getPassword()));
-        login.setCorreo(adminDTO.getCorreo());
-        login.setTelefono(adminDTO.getTelefono());
-        login.setEstado("ACTIVO");
-
-        loginRepository.save(login);
-        usuarioRepository.save(usuario);
-        return adminRepository.save(admin);
-
+    public List<Admin> listarAdmins(String estado) {
+        return adminRepository.findByEstado(estado);
     }
 
     @Override
@@ -184,186 +88,200 @@ public  class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin DesactivarUsuario(String usuarioCodigo) {
-        Optional<Admin> adminOptional = adminRepository.findById(usuarioCodigo);
-        if (adminOptional.isPresent()) {
-            Admin admin = adminOptional.get();
-            Optional<Usuario> usuario = usuarioRepository.findById(admin.getUsuario().getCodigo());
-            if (usuario.isPresent()) {
-                Usuario usuarioEntity = usuario.get();
-                usuarioEntity.setEstado("INACTIVO");
-                usuarioRepository.save(usuarioEntity);
-            }
-            Optional<Login> login = loginRepository.findById(admin.getUsuario().getCodigo());
+        Admin admin = adminRepository.findById(usuarioCodigo)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No se pudo encontrar el admin con código: " + usuarioCodigo));
 
-            if (login.isPresent()) {
-                Login loginEntity = login.get();
-                loginEntity.setEstado("INACTIVO");
-                loginRepository.save(loginEntity);
-            }
+        String usuarioId = admin.getUsuario().getCodigo();
 
-            admin.setEstado("INACTIVO");
+        // Desactivar Usuario
+        usuarioRepository.findById(usuarioId).ifPresent(usuario -> {
+            usuario.setEstado("INACTIVO");
+            usuarioRepository.save(usuario);
+        });
 
-            return adminRepository.save(admin);
-        } else {
-            throw new IllegalArgumentException(UsuarioMessage.ADMIN_NO_EXISTE.getMensaje());
-        }
+        // Desactivar Login
+        loginRepository.findById(usuarioId).ifPresent(login -> {
+            login.setEstado("INACTIVO");
+            loginRepository.save(login);
+        });
+
+        // Desactivar Admin
+        admin.setEstado("INACTIVO");
+        return adminRepository.save(admin);
     }
 
     @Override
     public Admin SuspenderUsuario(String usuarioCodigo) {
+        Admin admin = adminRepository.findById(usuarioCodigo)
+                .orElseThrow(() -> new IllegalArgumentException("El código de usuario no existe: " + usuarioCodigo));
+        String usuarioId = admin.getUsuario().getCodigo();
 
-            Optional<Admin> adminOptional = adminRepository.findById(usuarioCodigo);
-            System.out.print(adminOptional);
+        // Suspender Usuario
+        usuarioRepository.findById(usuarioId).ifPresent(usuario -> {
+            usuario.setEstado("SUSPENDIDO");
+            usuarioRepository.save(usuario);
+        });
 
-            if (adminOptional.isPresent()) {
-                Admin admin = adminOptional.get();
+        // Suspender Login
+        loginRepository.findById(usuarioId).ifPresent(login -> {
+            login.setEstado("SUSPENDIDO");
+            loginRepository.save(login);
+        });
 
-                Optional<Usuario> usuario = usuarioRepository.findById(admin.getUsuario().getCodigo());
-                if (usuario.isPresent()) {
-                    Usuario usuarioEntity = usuario.get();
-                    usuarioEntity.setEstado("SUSPENDIDO");
-                    usuarioRepository.save(usuarioEntity);
-                }
-
-                Optional<Login> login = loginRepository.findById(admin.getUsuario().getCodigo());
-                if (login.isPresent()) {
-                    Login loginEntity = login.get();
-                    loginEntity.setEstado("SUSPENDIDO");
-                    loginRepository.save(loginEntity);
-                }
-
-                admin.setEstado("SUSPENDIDO");
-                return adminRepository.save(admin);
-            } else {
-                throw new IllegalArgumentException("El código de usuario no existe: " + usuarioCodigo);
-            }
-
-
+        // Suspender Admin
+        admin.setEstado("SUSPENDIDO");
+        return adminRepository.save(admin);
     }
-
-
 
     @Override
     public Login ActivarUsuario(String usuarioCodigo) {
+        Login login = loginRepository.findById(usuarioCodigo)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontre el codigo"));
 
-            Optional<Login> login = loginRepository.findById(usuarioCodigo);
-            if (login.isPresent()) {
-                Login loginEntity = login.get();
+        // Activar Admin
+        adminRepository.findByCorreo(login.getCorreo()).ifPresent(admin -> {
+            admin.setEstado("ACTIVO");
+            adminRepository.save(admin);
+        });
 
-                Optional<Admin> admin = adminRepository.findByCorreo(login.get().getCorreo());
-                System.out.print(admin);
-                if(admin.isPresent()){
-                    Admin adminEntity = admin.get();
-                    adminEntity.setEstado("ACTIVO");
-                   adminRepository.save(adminEntity);
-                }
-                Optional<Usuario> usuario = usuarioRepository.findById(usuarioCodigo);
-                if (usuario.isPresent()) {
+        // Activar Usuario
+        usuarioRepository.findById(usuarioCodigo).ifPresent(usuario -> {
+            usuario.setEstado("ACTIVO");
+            usuarioRepository.save(usuario);
+        });
 
-                    Usuario usuarioEntity = usuario.get();
-                    usuarioEntity.setEstado("ACTIVO");
-                    usuarioRepository.save(usuarioEntity);
-                }
-                loginEntity.setEstado("ACTIVO");
-                return loginRepository.save(loginEntity);
-            }
-            else {
-                throw new IllegalArgumentException(UsuarioMessage.ADMIN_NO_EXISTE.getMensaje());
-            }
+        // Activar Login
+        login.setEstado("ACTIVO");
+        return loginRepository.save(login);
     }
 
     @Override
     public Login BloquearUsuario(String usuarioCodigo) {
-System.out.print(usuarioCodigo);
-        Login login = loginRepository.findByUsername(usuarioCodigo);
+        Login login = loginRepository.findById(usuarioCodigo)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontre el codigo"));
 
-        if (login != null) {
-            System.out.print(login);
-            login.setEstado("BLOQUEADO");
-            Optional<Admin> admin = adminRepository.findByCorreo(login.getCorreo());
-            System.out.print(admin);
-            if(admin.isPresent()){
-                Admin adminEntity = admin.get();
-                adminEntity.setEstado("BLOQUEADO");
-                adminRepository.save(adminEntity);
-            }
-            Optional<Usuario> usuario = usuarioRepository.findById(login.getCodigo());
-            if (usuario.isPresent()) {
+        // Bloquear Admin
+        adminRepository.findByCorreo(login.getCorreo()).ifPresent(admin -> {
+            admin.setEstado("BLOQUEADO");
+            adminRepository.save(admin);
+        });
 
-                Usuario usuarioEntity = usuario.get();
-                usuarioEntity.setEstado("BLOQUEADO");
-                usuarioRepository.save(usuarioEntity);
-            }
-            return loginRepository.save(login);
-        }
+        // Bloquear Usuario
+        usuarioRepository.findById(usuarioCodigo).ifPresent(usuario -> {
+            usuario.setEstado("BLOQUEADO");
+            usuarioRepository.save(usuario);
+        });
 
-        else {
-            throw new IllegalArgumentException(UsuarioMessage.ADMIN_NO_EXISTE.getMensaje());
-        }
-
+        // Bloquear Login
+        login.setEstado("BLOQUEADO");
+        return loginRepository.save(login);
     }
 
-    private boolean validarAdmin(AdminDTO adminDTO) {
+    private void validarAdmin(AdminRequestDTO adminDTO) {
 
-        if (usuarioService.usuarioExistePorUsername(adminDTO.getUsername())) {
-            throw new IllegalArgumentException("USUARIO YA EXISTE");
-        }
-        if (ExistePorEmail(adminDTO.getCorreo())) {
-            throw new IllegalArgumentException("CORREO YA EXISTE");
-        }
-
-        if (ExistePorTelefono(adminDTO.getTelefono())) {
-            throw new IllegalArgumentException("TELEFONO YA EXISTE");
-        }
-        if (!validaciones.validarTelefono(adminDTO.getTelefono())) {
+        if (!ValidacionUtil.esTelefonoValido(adminDTO.getTelefonoAdmin())) {
             throw new IllegalArgumentException("EL TELEFONO DEBE TENER 9 DIGITOS");
         }
 
-        if (!validaciones.correoEsValido(adminDTO.getCorreo())) {
-            throw new IllegalArgumentException("EL CORREO NO TIENEN FORMATO VALIDO");
+        if (!ValidacionUtil.esCorreoValido(adminDTO.getCorreoAdmin())) {
+            throw new IllegalArgumentException("EL CORREO NO TIENE FORMATO VALIDO");
         }
 
-        if (adminDTO.getEdad() < 18) {
+        if (adminDTO.getEdadAdmin() < 18) {
             throw new IllegalArgumentException("EDAD NO PERMITIDA");
         }
-        return ResponseEntity.ok("Validación exitosa").hasBody();
-    }
 
-
-
-
-
-    @Override
-    public List<Map<String, Object>> obtenerAdminsExcluyendoUsuario(String username) {
-        List<Object[]> resultados = adminRepository.listarAdminsExcluyendoUsuario(username);
-        List<Map<String, Object>> lista = new ArrayList<>();
-
-        for (Object[] fila : resultados) {
-            Map<String, Object> adminMap = new HashMap<>();
-
-            // Campos de la tabla admin (asumiendo orden exacto)
-            adminMap.put("Codigo", fila[0]);
-            adminMap.put("Nombre", fila[1]);
-            adminMap.put("Apellido", fila[2]);
-            adminMap.put("Correo", fila[3]);
-            adminMap.put("Telefono", fila[4]);
-            adminMap.put("Edad", fila[5]);
-            adminMap.put("FechaNacimiento", fila[6]);
-            adminMap.put("Estado", fila[7]);
-            adminMap.put("FechaRegistro", fila[8]);
-            adminMap.put("CodUsuario", fila[9]);
-
-            // Campos de la tabla usuario (extras del SP)
-            adminMap.put("Usuario", fila[10]);
-            adminMap.put("Contra", fila[11]);
-            adminMap.put("Rol", fila[12]);
-
-            lista.add(adminMap);
+        if (usuarioService.usuarioExistePorUsername(adminDTO.getUsernameAdmin())) {
+            throw new IllegalArgumentException("USUARIO YA EXISTE");
         }
 
-        return lista;
+        if (ExistePorEmail(adminDTO.getCodigoAdmin())) {
+            throw new IllegalArgumentException("CORREO YA EXISTE");
+        }
+
+        if (ExistePorTelefono(adminDTO.getTelefonoAdmin())) {
+            throw new IllegalArgumentException("TELEFONO YA EXISTE");
+        }
     }
 
+    @Override
+    public List<AdminResponseDTO> obtenerAdminsExcluyendoUsuario(String username) {
+        List<Object[]> resultados = adminRepository.listarAdminsExcluyendoUsuario(username);
+        List<AdminResponseDTO> listaDTO = new ArrayList<>();
+        for (Object[] fila : resultados) {
+            AdminResponseDTO dto = adminMapper.listarAdmin(fila);
+            listaDTO.add(dto);
+        }
+        return listaDTO;
+    }
 
+    @Override
+    public Admin Registro(AdminRequestDTO adminDTO) throws Exception {
+
+        try {
+
+            validarAdmin(adminDTO);
+
+            String codigoUsuario = obtenerUltimoCodigoUsuario();
+
+            String ultimoCodigo = SecuenciaUtil.generarSiguienteCodigo(codigoUsuario);
+
+            String codigoAdmin = ObtenerUltimoCodigoAdmin();
+
+            String ultimoCodigoAdmin = SecuenciaUtil.generarSiguienteCodigo(codigoAdmin);
+
+            usuarioService.regUsuario(ultimoCodigo, adminDTO.getUsernameAdmin(), adminDTO.getPasswordAdmin(),
+                    adminDTO.getCorreoAdmin(), adminDTO.getTelefonoAdmin(), "0001");
+
+            usuarioService.regLogin(ultimoCodigo, adminDTO.getUsernameAdmin(), adminDTO.getPasswordAdmin(),
+                    adminDTO.getCorreoAdmin(), adminDTO.getTelefonoAdmin(), "ADMIN");
+
+            Admin admin = new Admin();
+            admin.setCodigo(ultimoCodigoAdmin);
+            admin.setNombre(adminDTO.getNombreAdmin());
+            admin.setApellido(adminDTO.getApellidoAdmin());
+            admin.setTelefono(adminDTO.getTelefonoAdmin());
+            admin.setCorreo(adminDTO.getCorreoAdmin());
+            admin.setEdad(adminDTO.getEdadAdmin());
+            admin.setEstado("ACTIVO");
+            admin.setUsuario(ultimoCodigo);
+            admin.setFechaNacimiento(adminDTO.getFechaNacimientoAdmin());
+            admin.setFechaRegistro(LocalDate.now());
+
+            return adminRepository.save(admin);
+        } catch (Exception e) {
+            throw new Exception("Error al registrar el administrador: " + e.getMessage(), e);
+        }
+
+    }
+
+    @Override
+    public Admin Actualizar(AdminRequestDTO adminDTO) {
+
+        Optional<Admin> adminOptional = adminRepository.findById(adminDTO.getCodigoAdmin());
+
+        if (!adminOptional.isPresent()) {
+            throw new IllegalArgumentException(
+                    "El administrador con el código " + adminDTO.getCodigoAdmin() + " no existe.");
+        }
+
+        usuarioService.actLogin(adminDTO.getCodigoUsuarioAdmin(), adminDTO.getUsernameAdmin(),
+                adminDTO.getPasswordAdmin(), adminDTO.getCorreoAdmin(), adminDTO.getTelefonoAdmin(), "ADMIN");
+
+        usuarioService.actUsuario(adminDTO.getCodigoUsuarioAdmin(), adminDTO.getUsernameAdmin(),
+                adminDTO.getPasswordAdmin(), adminDTO.getCorreoAdmin(), adminDTO.getTelefonoAdmin(), "0001");
+
+        Admin admin = adminOptional.get();
+        admin.setNombre(adminDTO.getNombreAdmin());
+        admin.setApellido(adminDTO.getApellidoAdmin());
+        admin.setTelefono(adminDTO.getTelefonoAdmin());
+        admin.setFechaNacimiento(adminDTO.getFechaNacimientoAdmin());
+        admin.setEstado("ACTIVO");
+        admin.setCorreo(adminDTO.getCorreoAdmin());
+
+        return adminRepository.save(admin);
+
+    }
 
 }

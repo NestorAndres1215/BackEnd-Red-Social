@@ -1,7 +1,6 @@
 package com.na.backend.controller;
 
 import java.security.Principal;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +10,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import com.na.backend.jwt.JwtRequest;
-import com.na.backend.jwt.JwtResponse;
-import com.na.backend.jwt.JwtUtils;
-import com.na.backend.message.SeguridadMessage;
+import com.na.backend.message.BaseMessage;
 import com.na.backend.model.Login;
-import com.na.backend.security.UserDetailsServiceImpl;
+import com.na.backend.security.jwt.JwtRequest;
+import com.na.backend.security.jwt.JwtResponse;
+import com.na.backend.security.jwt.JwtUtils;
+import com.na.backend.security.service.UserDetailsServiceImpl;
+import com.na.backend.service.RevisionSuspensionService;
 import com.na.backend.service.UsuarioService;
 
 @Controller
@@ -31,6 +31,9 @@ public class AuthenticationController {
     private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
+    private RevisionSuspensionService revisionSuspensionService;
+
+    @Autowired
     private JwtUtils jwtUtils;
 
     @Autowired
@@ -43,13 +46,13 @@ public class AuthenticationController {
 
             if (!usuarioService.usuarioExistePorUsername(jwtRequest.getUsername())) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(SeguridadMessage.USUARIO_NO_ENCONTRADO.getMensaje());
+                        .body(BaseMessage.USUARIO_NO_ENCONTRADO.getMensaje());
             }
 
             // Verifica las credenciales del usuario
             if (!usuarioService.existsByUsernameAndPassword(jwtRequest.getUsername(), jwtRequest.getPassword())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(SeguridadMessage.CREDENCIALES_INVALIDAS.getMensaje());
+                        .body(BaseMessage.CREDENCIALES_INVALIDAS.getMensaje());
             }
 
             // Autenticación
@@ -67,7 +70,7 @@ public class AuthenticationController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(SeguridadMessage.ERROR_SOLICITUD.getMensaje());
+                    .body(BaseMessage.ERROR_SOLICITUD.getMensaje());
         }
     }
 
@@ -76,7 +79,7 @@ public class AuthenticationController {
         try {
             if (principal == null || principal.getName() == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(SeguridadMessage.USUARIO_NO_AUTORIZADO.getMensaje());
+                        .body(BaseMessage.USUARIO_NO_AUTORIZADO.getMensaje());
             }
             Login usuario = (Login) this.userDetailsService.loadUserByUsername(principal.getName());
             return ResponseEntity.ok(usuario);
@@ -84,14 +87,14 @@ public class AuthenticationController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(SeguridadMessage.ERROR_USUARIO_ACTUAL.getMensaje());
+                    .body(BaseMessage.ERROR_USUARIO_ACTUAL.getMensaje());
         }
     }
 
     @DeleteMapping("/usuario/bloquear/{codigo}")
-    public ResponseEntity<?> bloquear(@PathVariable String codigo){
+    public ResponseEntity<?> bloquear(@PathVariable String codigo) {
         try {
-            System.out.print( codigo);
+            System.out.print(codigo);
             return ResponseEntity.ok(usuarioService.validacionBloqueo(codigo));
 
         } catch (Exception e) {
@@ -100,16 +103,25 @@ public class AuthenticationController {
                     .body(e.getMessage());
         }
     }
+
     @DeleteMapping("/usuario/suspender/{codigo}")
     public ResponseEntity<?> suspender(@PathVariable String codigo, @RequestParam String rol) {
         try {
-            return  ResponseEntity.ok(usuarioService.validacionSuspender(codigo,rol));
+            return ResponseEntity.ok(usuarioService.validacionSuspender(codigo, rol));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());
         }
     }
 
-
+    @PostMapping("/usuario/revision-user/{correo}")
+    public ResponseEntity<?> usuarioRevision(@PathVariable String correo) {
+        try {
+            return ResponseEntity.ok(revisionSuspensionService.validacionSuspenderCorreo(correo));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
+    }
 
 }
