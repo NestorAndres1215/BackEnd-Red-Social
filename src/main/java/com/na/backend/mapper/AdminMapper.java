@@ -2,8 +2,10 @@ package com.na.backend.mapper;
 
 import java.time.LocalDate;
 
-import com.na.backend.dto.response.AdminResponseDTO;
+import org.springframework.stereotype.Component;
 
+import com.na.backend.dto.response.AdminResponseDTO;
+@Component
 public class AdminMapper {
 
     public  AdminResponseDTO listarAdmin(Object[] row) {

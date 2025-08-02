@@ -5,6 +5,8 @@ import com.na.backend.dto.response.HistorialResponseDTO;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import org.springframework.stereotype.Component;
+@Component
 public class HistorialMapper {
 
 

@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import com.na.backend.delegator.UsuarioDelegator;
 import com.na.backend.message.BaseMessage;
 import com.na.backend.model.Login;
 import com.na.backend.security.jwt.JwtRequest;
@@ -38,6 +39,10 @@ public class AuthenticationController {
 
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private UsuarioDelegator delegator;
+
+
 
     @PostMapping("/generate-token")
     public ResponseEntity<?> generarToken(@RequestBody JwtRequest jwtRequest) throws Exception {
@@ -95,7 +100,7 @@ public class AuthenticationController {
     public ResponseEntity<?> bloquear(@PathVariable String codigo) {
         try {
             System.out.print(codigo);
-            return ResponseEntity.ok(usuarioService.validacionBloqueo(codigo));
+            return ResponseEntity.ok(delegator.validacionBloqueo(codigo));
 
         } catch (Exception e) {
             System.out.print(e.getMessage());
@@ -107,7 +112,7 @@ public class AuthenticationController {
     @DeleteMapping("/usuario/suspender/{codigo}")
     public ResponseEntity<?> suspender(@PathVariable String codigo, @RequestParam String rol) {
         try {
-            return ResponseEntity.ok(usuarioService.validacionSuspender(codigo, rol));
+            return ResponseEntity.ok(delegator.validacionSuspender(codigo, rol));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());

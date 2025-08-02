@@ -2,12 +2,8 @@ package com.na.backend.service;
 
 import java.util.List;
 import java.util.Optional;
-
 import com.na.backend.model.Login;
-
 import com.na.backend.model.Usuario;
-
-import jakarta.mail.MessagingException;
 
 
 public interface UsuarioService {
@@ -21,10 +17,6 @@ public interface UsuarioService {
     boolean usuarioExistePorUsername(String username);
 
     boolean existsByUsernameAndPassword(String username, String password);
-
-    Login validacionBloqueo(String username);
-
-    Object  validacionSuspender(String codigo, String rol) throws MessagingException;
 
  
 
